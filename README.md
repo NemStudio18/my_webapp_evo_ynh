@@ -4,34 +4,34 @@ It shall NOT be edited by hand.
 -->
 
 <h1>
-  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/my_webapp.png" width="32px" alt="Logo of My Webapp">
-  My Webapp, packaged for YunoHost
+  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/flexwebapp.png" width="32px" alt="Logo of FlexWebApp">
+FlexWebApp, packaged for YunoHost
 </h1>
 
 Custom Web app with SFTP access to serve static (HTML, CSS, JS) and PHP files
 
-[![Version: 1.0~ynh21](https://img.shields.io/badge/Version-1.0~ynh21-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/my_webapp/)
+[![Version: 1.0~ynh21](https://img.shields.io/badge/Version-1.0~ynh21-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/flexwebapp/)
 
 <div align="center">
-<a href="https://apps.yunohost.org/app/my_webapp"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
-<a href="https://github.com/YunoHost-Apps/my_webapp_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
+<a href="https://apps.yunohost.org/app/flexwebapp"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
+<a href="https://github.com/YunoHost-Apps/flexwebapp_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
 </div>
 
 ## 📦 Developer info
 
-[![Automatic tests level](https://apps.yunohost.org/badge/cilevel/my_webapp)](https://ci-apps.yunohost.org/ci/apps/my_webapp/)
+[![Automatic tests level](https://apps.yunohost.org/badge/cilevel/flexwebapp)](https://ci-apps.yunohost.org/ci/apps/flexwebapp/)
 
-🛠️ Upstream My Webapp repository: <>
+🛠️ Upstream FlexWebApp repository: <>
 
-Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/my_webapp_ynh/tree/testing).
+Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/flexwebapp_ynh/tree/testing).
 
 The `testing` branch can be tested using:
 ```
 # fresh install:
-sudo yunohost app install https://github.com/YunoHost-Apps/my_webapp_ynh/tree/testing
+sudo yunohost app install https://github.com/YunoHost-Apps/flexwebapp_ynh/tree/testing
 
 # upgrade an existing install:
-sudo yunohost app upgrade my_webapp -u https://github.com/YunoHost-Apps/my_webapp_ynh/tree/testing
+sudo yunohost app upgrade flexwebapp -u https://github.com/YunoHost-Apps/flexwebapp_ynh/tree/testing
 ```
 
 ### 📚 App packaging documentation

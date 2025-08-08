@@ -31,7 +31,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>My Webapp - Front Controller Mode</title>
+    <title>FlexWebApp - Front Controller Mode</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -43,7 +43,7 @@ switch ($path) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>My Webapp - Front Controller Mode</h1>
+            <h1>FlexWebApp - Front Controller Mode</h1>
             <p>Welcome to your application running in front-controller mode!</p>
         </div>
         
@@ -82,7 +82,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>About - My Webapp</title>
+    <title>About - FlexWebApp</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -108,7 +108,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>Contact - My Webapp</title>
+    <title>Contact - FlexWebApp</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -149,7 +149,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>404 Not Found - My Webapp</title>
+    <title>404 Not Found - FlexWebApp</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }

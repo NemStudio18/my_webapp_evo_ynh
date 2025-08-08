@@ -120,7 +120,7 @@ then
     chpasswd <<< "${app}:${password}"
 fi
 
-# Change the user group for previous my_webapp install script
+# Change the user group for previous flexwebapp install script
 groupadd -f "$app"
 usermod -g "$app" "$app"
 

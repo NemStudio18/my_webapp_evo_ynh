@@ -1,11 +1,35 @@
-This application allows you to easily install an "empty" web application, in which you deploy your own custom website in the form of "static" HTML/CSS/JS assets or PHP.
+# FlexWebApp - Modern Web Application Framework
 
-Files can be uploaded [via SFTP](https://yunohost.org/en/filezilla) or any other method of your chosing.
+FlexWebApp is a versatile web application framework that allows you to easily deploy your custom websites with multiple deployment modes to suit your needs.
 
-During installation, you can also chose to initialize a MySQL or PostgreSQL database, which will be backed up and restored just like the other files in your application. The connection details will be stored in the file `db_access.txt` located in the root directory of the app.
+## 🚀 Multiple Deployment Modes
 
-PHP-FPM version can also be selected among (none), `8.1`, `8.2`, `8.3` and `8.4`.
+Choose the deployment mode that best fits your project:
 
-**Once installed, go to the chosen URL to know the user, domain and port you will have to use for the SFTP access.** The password is the one specified during the installation. Under the app directory, you will see a `www` folder which contains the public files served by this app. You can put all the files of your custom web application inside.
+- **Static Mode**: Perfect for static websites with HTML, CSS, and JavaScript
+- **Front Controller Mode**: Ideal for PHP applications with a single entry point at the root
+- **Framework Mode**: Modern framework structure with a dedicated `public/` directory
 
-You can also customize 404 errors - if you enable the option in the config panel. Simply create an `error` folder in the `www` root directory, containing your custom `html` files. 
+## 📁 File Management
+
+Upload your files via SFTP or any method of your choice. The application provides a clean, organized structure for your web content.
+
+## 🗄️ Database Support
+
+During installation, you can initialize a MySQL or PostgreSQL database that will be automatically backed up and restored with your application. Connection details are stored in `db_access.txt` in the root directory.
+
+## ⚡ PHP-FPM Configuration
+
+Select your preferred PHP-FPM version: none, 8.1, 8.2, 8.3, or 8.4.
+
+## 🔧 Post-Installation Configuration
+
+Once installed, visit your chosen URL to get SFTP access details. The password is set during installation. Your web files are located in the `www` folder.
+
+## 🎨 Custom Error Pages
+
+Enable custom 404 error pages through the configuration panel. Simply create an `error` folder in your `www` directory and add your custom HTML error files.
+
+## 🔒 Security & Performance
+
+Built with security and performance in mind, FlexWebApp provides a robust foundation for your web projects with automatic backups and optimized configurations. 

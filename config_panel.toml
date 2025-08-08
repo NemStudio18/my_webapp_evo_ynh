@@ -1,8 +1,8 @@
 version = "1.0"
 
 [main]
-name.en = "My Webapp configuration"
-name.fr = "Configuration de My Webapp"
+name.en = "FlexWebApp configuration"
+name.fr = "Configuration de FlexWebApp"
 
     [main.sftp]
     name.en = "SFTP access"
@@ -20,8 +20,8 @@ name.fr = "Configuration de My Webapp"
         type = "password"
         optional = true
         visible = "with_sftp"
-        help.en = "If a password already exist, leave blank and it will not be replaced."
-        help.fr = "Si un mot de passe existe déjà, laissez vide et il ne sera pas remplacé."
+        help.en = "If a password already exists, leave blank and it will not be replaced. If no password exists, a random one will be generated."
+        help.fr = "Si un mot de passe existe déjà, laissez vide et il ne sera pas remplacé. Si aucun mot de passe n'existe, un mot de passe aléatoire sera généré."
 
     [main.code_error]
     name.en = "HTML Custom error"

@@ -22,7 +22,15 @@ ssh_port=$(grep "^Port" /etc/ssh/sshd_config | awk '{print $2}')
 #=================================================
 ynh_script_progression --message="Validating installation parameters..." --weight=2
 
-[ $with_sftp -eq 0 ] || [ "$password" != "" ] || ynh_die --message="You need to set a password to enable SFTP"
+# Set default password for SFTP if not provided
+if [ $with_sftp -eq 1 ] && [ "$password" == "" ]; then
+    # Use the current user's password as default for SFTP
+    password=$(ynh_app_setting_get --app=$app --key=password)
+    if [ "$password" == "" ]; then
+        # If still empty, generate a random password
+        password=$(ynh_string_random --length=12)
+    fi
+fi
 
 # Validate mode requirements
 if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
