@@ -158,12 +158,7 @@ mkdir -p "$install_dir/www"
 # Create structure based on mode
 if [ "$mode" == "static" ]; then
     # Static mode - use original files
-    if [ $with_sftp -eq 1 ]
-    then
-        ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
-    else
-        ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
-    fi
+    ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
 elif [ "$mode" == "front-controller" ]; then
     # Front controller mode - create index.php and structure
     ynh_add_config --template="../sources/www/index.php" --destination="$install_dir/www/index.php"
@@ -181,12 +176,7 @@ elif [ "$mode" == "framework" ]; then
     mkdir -p "$install_dir/www/storage"
 else
     # Default to static mode
-    if [ $with_sftp -eq 1 ]
-    then
-        ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
-    else
-        ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
-    fi
+    ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
 fi
 
 chown -R $app:www-data "$install_dir"

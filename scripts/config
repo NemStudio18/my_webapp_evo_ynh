@@ -191,13 +191,7 @@ ynh_app_config_apply() {
         
         if [ "$mode" == "static" ]; then
             # Static mode - use original files
-            with_sftp=$(ynh_app_setting_get --app=$app --key=with_sftp)
-            if [ $with_sftp -eq 1 ]
-            then
-                ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
-            else
-                ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
-            fi
+            ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
         elif [ "$mode" == "front-controller" ]; then
             # Front controller mode - create index.php and structure
             ynh_add_config --template="../sources/www/index.php" --destination="$install_dir/www/index.php"

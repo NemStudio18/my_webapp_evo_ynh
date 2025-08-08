@@ -11,13 +11,19 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Get the request URI
-$request_uri = $_SERVER['REQUEST_URI'];
-$path = parse_url($request_uri, PHP_URL_PATH);
+$request_uri = $_SERVER['REQUEST_URI'] ?? '';
+$path = parse_url($request_uri, PHP_URL_PATH) ?? '';
 
-// Remove the path prefix if it exists
-$path_prefix = $_SERVER['SCRIPT_NAME'];
-if (strpos($path, $path_prefix) === 0) {
-    $path = substr($path, strlen($path_prefix));
+// Get the base path (the directory containing index.php)
+$script_name = $_SERVER['SCRIPT_NAME'] ?? '';
+$base_path = dirname($script_name);
+if ($base_path === '/') {
+    $base_path = '';
+}
+
+// Remove the base path from the request path
+if (strpos($path, $base_path) === 0) {
+    $path = substr($path, strlen($base_path));
 }
 
 // Remove leading slash
@@ -29,49 +35,231 @@ switch ($path) {
     case 'index.php':
         // Home page
         echo '<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlexWebApp - Front Controller Mode</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
-        .info { background: #e8f4f8; padding: 15px; border-radius: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .content h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+        }
+        
+        .content p {
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 1.5rem;
+            border-radius: 6px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .feature i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+        
+        .feature h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .feature p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .routes {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+        
+        .routes h3 {
+            color: #155724;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .routes ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .routes li a {
+            display: block;
+            padding: 1rem;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .routes li a:hover {
+            background: #218838;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-top: 2rem;
+        }
+        
+        .info h3 {
+            color: #1976d2;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .info p {
+            margin-bottom: 0.5rem;
+            font-family: "Courier New", monospace;
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>FlexWebApp - Front Controller Mode</h1>
+            <h1><i class="fas fa-code"></i> FlexWebApp - Front Controller Mode</h1>
             <p>Welcome to your application running in front-controller mode!</p>
         </div>
         
         <div class="content">
-            <h2>How it works</h2>
+            <h2><i class="fas fa-cogs"></i> How it works</h2>
             <p>In this mode, all requests are routed through this index.php file. This allows you to:</p>
-            <ul>
-                <li>Implement custom routing logic</li>
-                <li>Use modern PHP frameworks</li>
-                <li>Create RESTful APIs</li>
-                <li>Implement authentication and authorization</li>
-            </ul>
             
-            <div class="info">
-                <h3>Current Request Info</h3>
-                <p><strong>Request URI:</strong> ' . htmlspecialchars($request_uri) . '</p>
-                <p><strong>Path:</strong> ' . htmlspecialchars($path) . '</p>
-                <p><strong>Method:</strong> ' . htmlspecialchars($_SERVER['REQUEST_METHOD']) . '</p>
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-route"></i>
+                    <h3>Custom Routing</h3>
+                    <p>Implement custom routing logic for your application</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-layer-group"></i>
+                    <h3>Modern Frameworks</h3>
+                    <p>Use modern PHP frameworks and libraries</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-plug"></i>
+                    <h3>RESTful APIs</h3>
+                    <p>Create RESTful APIs and web services</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Security</h3>
+                    <p>Implement authentication and authorization</p>
+                </div>
             </div>
             
-            <h3>Example Routes</h3>
-            <p>Try these URLs to see the routing in action:</p>
-            <ul>
-                <li><a href="' . htmlspecialchars($path_prefix) . '">Home</a></li>
-                <li><a href="' . htmlspecialchars($path_prefix) . 'about">About</a></li>
-                <li><a href="' . htmlspecialchars($path_prefix) . 'contact">Contact</a></li>
-                <li><a href="' . htmlspecialchars($path_prefix) . 'api/test">API Test</a></li>
-            </ul>
+            <div class="info">
+                <h3><i class="fas fa-info-circle"></i> Current Request Info</h3>
+                <p><strong>Request URI:</strong> ' . htmlspecialchars($request_uri) . '</p>
+                <p><strong>Path:</strong> ' . htmlspecialchars($path) . '</p>
+                <p><strong>Method:</strong> ' . htmlspecialchars($_SERVER['REQUEST_METHOD'] ?? '') . '</p>
+            </div>
+            
+            <div class="routes">
+                <h3><i class="fas fa-link"></i> Example Routes</h3>
+                <p>Try these URLs to see the routing in action:</p>
+                <ul>
+                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="/about"><i class="fas fa-info-circle"></i> About (Demo Route)</a></li>
+                    <li><a href="/contact"><i class="fas fa-envelope"></i> Contact (Demo Route)</a></li>
+                    <li><a href="/api/test"><i class="fas fa-code"></i> API Test (Demo Route)</a></li>
+                    <li><a href="/nonexistent"><i class="fas fa-exclamation-triangle"></i> 404 Test</a></li>
+                </ul>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                    <i class="fas fa-info-circle"></i> <strong>Note:</strong> These are demo routes handled by the front controller. 
+                    In a real application, you would create actual pages or API endpoints.
+                </p>
+            </div>
         </div>
     </div>
 </body>
@@ -80,24 +268,89 @@ switch ($path) {
         
     case 'about':
         echo '<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - FlexWebApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .content p {
+            margin-bottom: 1rem;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>About</h1>
+            <h1><i class="fas fa-info-circle"></i> About</h1>
         </div>
         <div class="content">
             <p>This is the About page. You can customize this content as needed.</p>
-            <p><a href="' . htmlspecialchars($path_prefix) . '">← Back to Home</a></p>
+            <p>FlexWebApp provides a flexible foundation for your web applications with multiple deployment modes to suit your needs.</p>
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
         </div>
     </div>
 </body>
@@ -106,24 +359,89 @@ switch ($path) {
         
     case 'contact':
         echo '<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - FlexWebApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .content p {
+            margin-bottom: 1rem;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Contact</h1>
+            <h1><i class="fas fa-envelope"></i> Contact</h1>
         </div>
         <div class="content">
             <p>This is the Contact page. You can add a contact form here.</p>
-            <p><a href="' . htmlspecialchars($path_prefix) . '">← Back to Home</a></p>
+            <p>Feel free to customize this page with your contact information or a contact form.</p>
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
         </div>
     </div>
 </body>
@@ -147,24 +465,89 @@ switch ($path) {
         // 404 Not Found
         http_response_code(404);
         echo '<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 Not Found - FlexWebApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #ffebee; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        
+        .header h1 {
+            color: #e74c3c;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .content p {
+            margin-bottom: 1rem;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>404 - Page Not Found</h1>
+            <h1><i class="fas fa-exclamation-triangle"></i> 404 - Page Not Found</h1>
         </div>
         <div class="content">
             <p>The requested page "' . htmlspecialchars($path) . '" was not found.</p>
-            <p><a href="' . htmlspecialchars($path_prefix) . '">← Back to Home</a></p>
+            <p>Please check the URL and try again.</p>
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
         </div>
     </div>
 </body>
