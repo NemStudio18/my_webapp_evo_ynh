@@ -1,10 +1,14 @@
 {% if database != 'none' %}
 
-Here are information to log into the database:
+## 🗄️ Database Connection Information
 
-- Type: `__DATABASE__`
-- Database user: `__DB_USER__`
-- Database name: `__DB_NAME__`
-- Password: `__DB_PWD__`
+Your database has been successfully configured. Here are the connection details:
+
+- **Database Type**: `__DATABASE__`
+- **Database User**: `__DB_USER__`
+- **Database Name**: `__DB_NAME__`
+- **Password**: `__DB_PWD__`
+
+> 💡 **Tip**: These credentials are automatically backed up with your application. Keep them secure!
 
 {% endif %}

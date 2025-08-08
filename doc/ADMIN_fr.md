@@ -1,35 +1,100 @@
-Cette app est uniquement un squelette : il vous appartient d'ajouter vos propre pages HTML, CSS, PHP... à l'intérieur de `__INSTALL_DIR__/www/`. Une manière de procéder est d'utiliser SFTP.
+# Guide d'Administration FlexWebApp
 
-### Connexion avec SFTP
+FlexWebApp est un framework d'application web flexible qui propose plusieurs modes de déploiement. Ce guide vous aidera à gérer votre application efficacement.
 
-Une fois installée, rendez-vous sur l'URL choisie pour connaître le nom d'utilisateur, le domaine et le port que vous devrez utiliser pour l'accès SFTP. 
+## 🚀 Premiers Pas
 
-- Hôte: `__DOMAIN__`
-- Nom d'utilisateur: `__ID__`
-- Mot de passe: mot de passe défini lors de l'installation
-- Port: 22 (à moins que vous ayez changé le port SSH)
+FlexWebApp crée une structure d'application web propre où vous pouvez ajouter votre propre contenu (HTML, CSS, PHP, etc.) à l'intérieur de `__INSTALL_DIR__/www/`. La méthode la plus courante pour gérer vos fichiers est via SFTP.
 
-Pour vous connecter, vous devrez utiliser une application SFTP tel que [Filezilla](https://filezilla-project.org/) pour Windows, Mac ou Linux. Vous pouvez aussi directement utiliser votre gestionnaire de fichiers sous Linux ou [Mac](https://support.apple.com/guide/mac-help/connect-mac-shared-computers-servers-mchlp1140/mac).
+## 📁 Gestion des Fichiers via SFTP
 
-#### Oubli du mot de passe SFTP
+### Détails de Connexion
 
-Si vous avez oublié votre mot de passe SFTP, vous pouvez le changer dans la webadmin de Yunohost dans `Applications > Votre webapp > My Webapp configuration`.
-Vous pourrez aussi vérifier que SFTP est activé pour votre app.
+Une fois installée, rendez-vous sur l'URL de votre application pour obtenir les informations de connexion SFTP :
 
-### Connexion par le terminal
+- **Hôte** : `__DOMAIN__`
+- **Nom d'utilisateur** : `__ID__`
+- **Mot de passe** : Mot de passe défini lors de l'installation
+- **Port** : 22 (à moins que vous ayez changé le port SSH)
 
-A partir de YunoHost v11.1.21, vous pouvez lancer `sudo yunohost app shell __APP__` dans un terminal pour vous connecter en tant que l'utilisateur gérant l'app.
+### Clients SFTP
 
-La commande `php` pointera vers la version de PHP installée pour l'app.
+Vous pouvez vous connecter avec n'importe quel client SFTP :
+- **Windows/Mac/Linux** : [FileZilla](https://filezilla-project.org/)
+- **Mac** : Finder intégré (Aller > Se connecter au serveur)
+- **Linux** : Gestionnaire de fichiers avec support SFTP
 
-### Ajouter ou modifier les fichiers
+### 🔑 Gestion de l'Accès SFTP
 
-Après vous être connecté, sous le répertoire Web vous verrez un dossier `www` qui contient les fichiers publics servis par cette application. Vous pouvez mettre tous les fichiers de votre application Web personnalisée à l'intérieur.
+#### Mot de Passe Oublié ?
 
-### Gestion des erreurs 403 et 404
+Si vous avez oublié votre mot de passe SFTP, vous pouvez le changer dans l'interface web admin de YunoHost :
+1. Allez dans **Applications > FlexWebApp > Configuration FlexWebApp**
+2. Mettez à jour le mot de passe SFTP
+3. Vérifiez que SFTP est activé
 
-La configuration du serveur web prend en charge la gestion des erreurs http `403` et `404` (accès refusé et ressource non trouvée). Ajoutez un dossier `error` à l'emplacement `__INSTALL_DIR__/www/error`, puis ajoutez-y vos fichiers `403.html` et `404.html`.
+## 💻 Accès en Ligne de Commande
 
-### Personnaliser la configuration nginx
+À partir de YunoHost v11.1.21, vous pouvez accéder à votre application via la ligne de commande :
 
-Si vous souhaitez ajuster la configuration nginx pour cette app, il est recommandé d'éditer `/etc/nginx/conf.d/__DOMAIN__.d/__ID__.d/WHATEVER_NAME.conf` (assurez-vous que le fichier a l'extension `.conf`) puis rechargez nginx après vous être assuré que la configuration est valide à l'aide de `nginx -t`.
+```bash
+sudo yunohost app shell __APP__
+```
+
+Cela vous donne un accès direct en tant qu'utilisateur de l'application. La commande `php` pointera vers la version PHP installée pour votre app.
+
+## 📂 Structure des Fichiers
+
+Après connexion, vous verrez un dossier `www` contenant les fichiers publics servis par votre application. C'est là que vous devez placer tous vos fichiers d'application web.
+
+### Modes d'Application
+
+Selon votre mode d'installation, vos fichiers doivent être organisés comme suit :
+
+- **Mode Statique** : Placez les fichiers directement dans `www/`
+- **Mode Contrôleur Frontal** : Placez `index.php` à la racine de `www/`
+- **Mode Framework** : Placez les fichiers dans `www/public/` avec `index.php` comme contrôleur frontal
+
+## ⚠️ Gestion des Erreurs
+
+### Pages d'Erreur Personnalisées
+
+FlexWebApp prend en charge la gestion des pages d'erreur personnalisées pour les erreurs HTTP 403 et 404 :
+
+1. Créez un dossier `error` à `__INSTALL_DIR__/www/error/`
+2. Ajoutez vos pages d'erreur personnalisées :
+   - `403.html` pour les erreurs "Accès Refusé"
+   - `404.html` pour les erreurs "Non Trouvé"
+
+### Activation des Pages d'Erreur
+
+Activez les pages d'erreur personnalisées via le panneau de configuration dans l'interface web admin de YunoHost.
+
+## ⚙️ Configuration Avancée
+
+### Personnalisation de la Configuration Nginx
+
+Si vous devez personnaliser la configuration Nginx :
+
+1. Éditez `/etc/nginx/conf.d/__DOMAIN__.d/__ID__.d/VOTRE_FICHIER_PERSONNALISE.conf`
+2. Assurez-vous que le fichier a l'extension `.conf`
+3. Testez la configuration : `nginx -t`
+4. Rechargez Nginx : `systemctl reload nginx`
+
+> 💡 **Conseil** : Testez toujours votre configuration Nginx avant de recharger pour éviter de casser votre site.
+
+## 🔧 Panneau de Configuration
+
+Accédez au panneau de configuration dans l'interface web admin de YunoHost pour :
+- Changer le mot de passe SFTP
+- Activer/désactiver l'accès SFTP
+- Basculer entre les modes d'application
+- Configurer les pages d'erreur personnalisées
+- Gérer les paramètres PHP
+
+## 📚 Bonnes Pratiques
+
+- **Sauvegardez régulièrement** : Vos fichiers sont automatiquement sauvegardés avec YunoHost
+- **Utilisez le contrôle de version** : Considérez l'utilisation de Git pour vos fichiers d'application web
+- **Testez les modifications** : Testez toujours les modifications dans un environnement de développement d'abord
+- **Maintenez PHP à jour** : Mettez régulièrement à jour votre version PHP pour la sécurité

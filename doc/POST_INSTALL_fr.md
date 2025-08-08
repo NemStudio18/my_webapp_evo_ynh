@@ -1,10 +1,14 @@
 {% if database != 'none' %}
 
-Voici les informations pour se connecter à la base de donnée:
+## 🗄️ Informations de Connexion à la Base de Données
 
-- Type : `__DATABASE__`
-- Utilisateur de la base de données : `__DB_USER__`
-- Nom de la base de données : `__DB_NAME__`
-- Mot de passe : `__DB_PWD__`
+Votre base de données a été configurée avec succès. Voici les détails de connexion :
+
+- **Type de Base de Données** : `__DATABASE__`
+- **Utilisateur de la Base de Données** : `__DB_USER__`
+- **Nom de la Base de Données** : `__DB_NAME__`
+- **Mot de Passe** : `__DB_PWD__`
+
+> 💡 **Conseil** : Ces identifiants sont automatiquement sauvegardés avec votre application. Gardez-les en sécurité !
 
 {% endif %}

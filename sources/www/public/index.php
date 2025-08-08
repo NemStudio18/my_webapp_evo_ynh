@@ -31,7 +31,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>My Webapp - Framework Mode</title>
+    <title>FlexWebApp - Framework Mode</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -44,7 +44,7 @@ switch ($path) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>My Webapp - Framework Mode</h1>
+            <h1>FlexWebApp - Framework Mode</h1>
             <p>Welcome to your application running in framework mode!</p>
         </div>
         
@@ -104,7 +104,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>About - My Webapp Framework</title>
+    <title>About - FlexWebApp Framework</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -130,7 +130,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>Contact - My Webapp Framework</title>
+    <title>Contact - FlexWebApp Framework</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -172,7 +172,7 @@ switch ($path) {
         echo '<!DOCTYPE html>
 <html>
 <head>
-    <title>404 Not Found - My Webapp Framework</title>
+    <title>404 Not Found - FlexWebApp Framework</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .container { max-width: 800px; margin: 0 auto; }
