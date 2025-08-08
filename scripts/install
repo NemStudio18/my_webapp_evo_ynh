@@ -24,6 +24,13 @@ ynh_script_progression --message="Validating installation parameters..." --weigh
 
 [ $with_sftp -eq 0 ] || [ "$password" != "" ] || ynh_die --message="You need to set a password to enable SFTP"
 
+# Validate mode requirements
+if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
+    if [ "$phpversion" == "none" ]; then
+        ynh_die --message="PHP is required for $mode mode. Please select a PHP version."
+    fi
+fi
+
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
@@ -74,8 +81,35 @@ then
 fi
 
 
-# Create a dedicated NGINX config
-ynh_add_nginx_config
+# Create a dedicated NGINX config based on mode
+if [ "$mode" == "static" ]; then
+    ynh_add_nginx_config
+elif [ "$mode" == "front-controller" ]; then
+    ynh_add_nginx_config --template="nginx-front-controller.conf"
+elif [ "$mode" == "framework" ]; then
+    ynh_add_nginx_config --template="nginx-framework.conf"
+else
+    # Default to static mode
+    ynh_add_nginx_config
+fi
+
+# Ensure only the correct template is used and clean up any unwanted templates
+# Remove any other main templates that might have been copied
+if [ "$mode" != "static" ]; then
+    # Remove nginx.conf if it was copied (should not happen, but safety check)
+    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx.conf"
+fi
+
+if [ "$mode" != "front-controller" ]; then
+    # Remove nginx-front-controller.conf if it was copied
+    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-front-controller.conf"
+fi
+
+if [ "$mode" != "framework" ]; then
+    # Remove nginx-framework.conf if it was copied
+    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-framework.conf"
+fi
+
 ynh_add_config --template="example-custom-nginx-config.conf" --destination="$nginx_extra_conf_dir/sample.conf"
 
 #=================================================
@@ -106,11 +140,38 @@ fi
 
 mkdir -p "$install_dir/www"
 
-if [ $with_sftp -eq 1 ]
-then
-    ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
+# Create structure based on mode
+if [ "$mode" == "static" ]; then
+    # Static mode - use original files
+    if [ $with_sftp -eq 1 ]
+    then
+        ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
+    else
+        ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
+    fi
+elif [ "$mode" == "front-controller" ]; then
+    # Front controller mode - create index.php and structure
+    ynh_add_config --template="../sources/www/index.php" --destination="$install_dir/www/index.php"
+    mkdir -p "$install_dir/www/config"
+    mkdir -p "$install_dir/www/src"
+    mkdir -p "$install_dir/www/app"
+elif [ "$mode" == "framework" ]; then
+    # Framework mode - create public structure
+    mkdir -p "$install_dir/www/public"
+    ynh_add_config --template="../sources/www/public/index.php" --destination="$install_dir/www/public/index.php"
+    mkdir -p "$install_dir/www/app"
+    mkdir -p "$install_dir/www/config"
+    mkdir -p "$install_dir/www/src"
+    mkdir -p "$install_dir/www/vendor"
+    mkdir -p "$install_dir/www/storage"
 else
-    ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
+    # Default to static mode
+    if [ $with_sftp -eq 1 ]
+    then
+        ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
+    else
+        ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
+    fi
 fi
 
 chown -R $app:www-data "$install_dir"

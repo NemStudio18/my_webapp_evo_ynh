@@ -70,6 +70,15 @@ ram.runtime = "50M"
     help.en = "Once custom error enabled, you can add/create a custom `404.html` file in a directory `www\\error`."
     help.fr = "Une fois l'erreur personnalisée activée, vous pouvez ajouter/créer un fichier `404.html` personnalisé dans un répertoire `www\\error`."
 
+    [install.mode]
+    ask.en = "Choose the application mode"
+    ask.fr = "Choisissez le mode d'application"
+    type = "select"
+    choices = ["static", "front-controller", "framework"]
+    default = "static"
+    help.en = "static: Static files only, front-controller: PHP front controller at root, framework: Modern framework structure with public folder"
+    help.fr = "static: Fichiers statiques uniquement, front-controller: Contrôleur frontal PHP à la racine, framework: Structure de framework moderne avec dossier public"
+
 [resources]
     [resources.system_user]
 

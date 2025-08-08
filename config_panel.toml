@@ -45,3 +45,16 @@ name.fr = "Configuration de My Webapp"
         type = "select"
         choices = ["none", "8.1", "8.2", "8.3", "8.4"]
         default = "none"
+
+    [main.application_mode]
+    name.en = "Application Mode"
+    name.fr = "Mode d'Application"
+
+        [main.application_mode.mode]
+        ask.en = "Choose the application mode"
+        ask.fr = "Choisissez le mode d'application"
+        type = "select"
+        choices = ["static", "front-controller", "framework"]
+        default = "static"
+        help.en = "static: Static files only, front-controller: PHP front controller at root, framework: Modern framework structure with public folder"
+        help.fr = "static: Fichiers statiques uniquement, front-controller: Contrôleur frontal PHP à la racine, framework: Structure de framework moderne avec dossier public"

@@ -49,6 +49,15 @@ ynh_app_config_validate() {
     then
         ynh_die --message="You need to set a password to enable SFTP"
     fi
+
+    # Validate mode requirements
+    if [ "${changed[mode]}" == "true" ]; then
+        if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
+            if [ "$phpversion" == "none" ]; then
+                ynh_die --message="PHP is required for $mode mode. Please select a PHP version."
+            fi
+        fi
+    fi
 }
 
 ynh_app_config_apply() {
@@ -122,6 +131,76 @@ ynh_app_config_apply() {
     if [ "$phpversion" != "none" ]
     then
         ynh_add_fpm_config --phpversion=$phpversion
+    fi
+
+    # Handle mode changes
+    if [ "${changed[mode]}" == "true" ]
+    then
+        ynh_script_progression --message="Changing application mode to $mode..." --weight=2
+        
+        # Backup current configuration
+        ynh_backup_before_upgrade
+        
+        # Reconfigure nginx based on new mode
+        if [ "$mode" == "static" ]; then
+            ynh_add_nginx_config
+        elif [ "$mode" == "front-controller" ]; then
+            ynh_add_nginx_config --template="nginx-front-controller.conf"
+        elif [ "$mode" == "framework" ]; then
+            ynh_add_nginx_config --template="nginx-framework.conf"
+        fi
+        
+        # Ensure only the correct template is used and clean up any unwanted templates
+        # Remove any other main templates that might have been copied
+        if [ "$mode" != "static" ]; then
+            # Remove nginx.conf if it was copied (should not happen, but safety check)
+            ynh_secure_remove --file="$nginx_extra_conf_dir/nginx.conf"
+        fi
+
+        if [ "$mode" != "front-controller" ]; then
+            # Remove nginx-front-controller.conf if it was copied
+            ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-front-controller.conf"
+        fi
+
+        if [ "$mode" != "framework" ]; then
+            # Remove nginx-framework.conf if it was copied
+            ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-framework.conf"
+        fi
+        
+        # Create appropriate file structure
+        install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+        mkdir -p "$install_dir/www"
+        
+        if [ "$mode" == "static" ]; then
+            # Static mode - use original files
+            with_sftp=$(ynh_app_setting_get --app=$app --key=with_sftp)
+            if [ $with_sftp -eq 1 ]
+            then
+                ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
+            else
+                ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
+            fi
+        elif [ "$mode" == "front-controller" ]; then
+            # Front controller mode - create index.php and structure
+            ynh_add_config --template="../sources/www/index.php" --destination="$install_dir/www/index.php"
+            mkdir -p "$install_dir/www/config"
+            mkdir -p "$install_dir/www/src"
+            mkdir -p "$install_dir/www/app"
+        elif [ "$mode" == "framework" ]; then
+            # Framework mode - create public structure
+            mkdir -p "$install_dir/www/public"
+            ynh_add_config --template="../sources/www/public/index.php" --destination="$install_dir/www/public/index.php"
+            mkdir -p "$install_dir/www/app"
+            mkdir -p "$install_dir/www/config"
+            mkdir -p "$install_dir/www/src"
+            mkdir -p "$install_dir/www/vendor"
+            mkdir -p "$install_dir/www/storage"
+        fi
+        
+        # Set proper permissions
+        chown -R $app:www-data "$install_dir/www"
+        
+        ynh_systemd_action --service_name=nginx --action=reload
     fi
 }
 
