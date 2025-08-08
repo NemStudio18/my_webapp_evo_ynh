@@ -2,11 +2,11 @@
 
 FlexWebApp est un framework d'application web flexible qui propose plusieurs modes de déploiement. Ce guide vous aidera à gérer votre application efficacement.
 
-## 🚀 Premiers Pas
+## <i class="fas fa-rocket"></i> Premiers Pas
 
 FlexWebApp crée une structure d'application web propre où vous pouvez ajouter votre propre contenu (HTML, CSS, PHP, etc.) à l'intérieur de `__INSTALL_DIR__/www/`. La méthode la plus courante pour gérer vos fichiers est via SFTP.
 
-## 📁 Gestion des Fichiers via SFTP
+## <i class="fas fa-folder"></i> Gestion des Fichiers via SFTP
 
 ### Détails de Connexion
 
@@ -24,7 +24,7 @@ Vous pouvez vous connecter avec n'importe quel client SFTP :
 - **Mac** : Finder intégré (Aller > Se connecter au serveur)
 - **Linux** : Gestionnaire de fichiers avec support SFTP
 
-### 🔑 Gestion de l'Accès SFTP
+### <i class="fas fa-key"></i> Gestion de l'Accès SFTP
 
 #### Mot de Passe Oublié ?
 
@@ -33,7 +33,7 @@ Si vous avez oublié votre mot de passe SFTP, vous pouvez le changer dans l'inte
 2. Mettez à jour le mot de passe SFTP
 3. Vérifiez que SFTP est activé
 
-## 💻 Accès en Ligne de Commande
+## <i class="fas fa-terminal"></i> Accès en Ligne de Commande
 
 À partir de YunoHost v11.1.21, vous pouvez accéder à votre application via la ligne de commande :
 
@@ -43,7 +43,7 @@ sudo yunohost app shell __APP__
 
 Cela vous donne un accès direct en tant qu'utilisateur de l'application. La commande `php` pointera vers la version PHP installée pour votre app.
 
-## 📂 Structure des Fichiers
+## <i class="fas fa-folder-open"></i> Structure des Fichiers
 
 Après connexion, vous verrez un dossier `www` contenant les fichiers publics servis par votre application. C'est là que vous devez placer tous vos fichiers d'application web.
 
@@ -55,7 +55,50 @@ Selon votre mode d'installation, vos fichiers doivent être organisés comme sui
 - **Mode Contrôleur Frontal** : Placez `index.php` à la racine de `www/`
 - **Mode Framework** : Placez les fichiers dans `www/public/` avec `index.php` comme contrôleur frontal
 
-## ⚠️ Gestion des Erreurs
+### Ajouter des Dossiers et Fichiers Personnalisés
+
+Vous pouvez créer n'importe quelle structure de dossiers dans `www/` pour organiser votre application :
+
+```
+www/
+├── index.php              # Contrôleur frontal (Mode Contrôleur Frontal)
+├── assets/                # CSS, JS, images
+│   ├── css/
+│   ├── js/
+│   └── images/
+├── uploads/               # Fichiers uploadés par les utilisateurs
+├── templates/             # Templates HTML
+├── includes/              # Inclusions PHP
+├── api/                   # Points d'entrée API
+├── admin/                 # Zone d'administration
+├── config/                # Fichiers de configuration
+├── src/                   # Code source
+├── app/                   # Logique d'application
+└── vendor/                # Dépendances (Composer)
+```
+
+**Note** : Tous les fichiers dans `www/` sont accessibles publiquement. Gardez les fichiers sensibles en dehors de ce répertoire.
+
+### Créer de Vraies Pages
+
+En mode Contrôleur Frontal, vous pouvez créer de vrais fichiers HTML qui seront servis directement :
+
+```
+www/
+├── index.php              # Contrôleur frontal (gère le routage)
+├── about.html             # Vraie page about (servie directement)
+├── contact.html           # Vraie page contact (servie directement)
+├── assets/                # CSS, JS, images
+│   ├── css/
+│   ├── js/
+│   └── images/
+└── api/                   # Points d'entrée API
+    └── test.php           # Vrai point d'entrée API
+```
+
+**Important** : Les fichiers statiques (`.html`, `.css`, `.js`, images) sont servis directement par Nginx. Seuls les fichiers PHP et les chemins inexistants sont routés via `index.php`.
+
+## <i class="fas fa-exclamation-triangle"></i> Gestion des Erreurs
 
 ### Pages d'Erreur Personnalisées
 
@@ -70,7 +113,7 @@ FlexWebApp prend en charge la gestion des pages d'erreur personnalisées pour le
 
 Activez les pages d'erreur personnalisées via le panneau de configuration dans l'interface web admin de YunoHost.
 
-## ⚙️ Configuration Avancée
+## <i class="fas fa-cogs"></i> Configuration Avancée
 
 ### Personnalisation de la Configuration Nginx
 
@@ -81,9 +124,9 @@ Si vous devez personnaliser la configuration Nginx :
 3. Testez la configuration : `nginx -t`
 4. Rechargez Nginx : `systemctl reload nginx`
 
-> 💡 **Conseil** : Testez toujours votre configuration Nginx avant de recharger pour éviter de casser votre site.
+> <i class="fas fa-lightbulb"></i> **Conseil** : Testez toujours votre configuration Nginx avant de recharger pour éviter de casser votre site.
 
-## 🔧 Panneau de Configuration
+## <i class="fas fa-wrench"></i> Panneau de Configuration
 
 Accédez au panneau de configuration dans l'interface web admin de YunoHost pour :
 - Changer le mot de passe SFTP
@@ -92,7 +135,7 @@ Accédez au panneau de configuration dans l'interface web admin de YunoHost pour
 - Configurer les pages d'erreur personnalisées
 - Gérer les paramètres PHP
 
-## 📚 Bonnes Pratiques
+## <i class="fas fa-book"></i> Bonnes Pratiques
 
 - **Sauvegardez régulièrement** : Vos fichiers sont automatiquement sauvegardés avec YunoHost
 - **Utilisez le contrôle de version** : Considérez l'utilisation de Git pour vos fichiers d'application web
