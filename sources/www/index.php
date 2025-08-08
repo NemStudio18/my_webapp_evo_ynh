@@ -143,42 +143,6 @@ switch ($path) {
             font-size: 0.9rem;
         }
         
-        .routes {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 1.5rem;
-            border-radius: 6px;
-            margin-top: 2rem;
-        }
-        
-        .routes h3 {
-            color: #155724;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-        
-        .routes ul {
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        
-        .routes li a {
-            display: block;
-            padding: 1rem;
-            background: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            text-align: center;
-            transition: background-color 0.2s ease;
-        }
-        
-        .routes li a:hover {
-            background: #218838;
-        }
-        
         .info {
             background: #e3f2fd;
             border: 1px solid #bbdefb;
@@ -191,6 +155,22 @@ switch ($path) {
             color: #1976d2;
             margin-bottom: 1rem;
             font-size: 1.2rem;
+        }
+        
+        .info dl {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        
+        .info dt {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info dd {
+            color: #6c757d;
         }
         
         .info p {
@@ -239,26 +219,24 @@ switch ($path) {
             </div>
             
             <div class="info">
-                <h3><i class="fas fa-info-circle"></i> Current Request Info</h3>
+                <h3><i class="fas fa-info-circle"></i> Current Info</h3>
                 <p><strong>Request URI:</strong> ' . htmlspecialchars($request_uri) . '</p>
                 <p><strong>Path:</strong> ' . htmlspecialchars($path) . '</p>
                 <p><strong>Method:</strong> ' . htmlspecialchars($_SERVER['REQUEST_METHOD'] ?? '') . '</p>
             </div>
             
-            <div class="routes">
-                <h3><i class="fas fa-link"></i> Example Routes</h3>
-                <p>Try these URLs to see the routing in action:</p>
-                <ul>
-                    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="/about"><i class="fas fa-info-circle"></i> About (Demo Route)</a></li>
-                    <li><a href="/contact"><i class="fas fa-envelope"></i> Contact (Demo Route)</a></li>
-                    <li><a href="/api/test"><i class="fas fa-code"></i> API Test (Demo Route)</a></li>
-                    <li><a href="/nonexistent"><i class="fas fa-exclamation-triangle"></i> 404 Test</a></li>
-                </ul>
-                <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
-                    <i class="fas fa-info-circle"></i> <strong>Note:</strong> These are demo routes handled by the front controller. 
-                    In a real application, you would create actual pages or API endpoints.
-                </p>
+            <div class="info">
+                <h3><i class="fas fa-server"></i> SFTP Connection Details</h3>
+                <dl>
+                    <dt>Domain</dt>
+                    <dd>__DOMAIN__</dd>
+                    <dt>Port</dt>
+                    <dd>__SSH_PORT__</dd>
+                    <dt>User</dt>
+                    <dd>__ID__</dd>
+                    <dt>Password</dt>
+                    <dd><em>the one you set at installation (or your account password if none was set)</em></dd>
+                </dl>
             </div>
         </div>
     </div>
