@@ -83,7 +83,15 @@ ynh_app_config_apply() {
 
         nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
         mkdir -p "$nginx_extra_conf_dir"
-        if [ "$phpversion" == "none" ]
+        
+        # For front-controller and framework modes, PHP is required
+        if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
+            if [ "$phpversion" == "none" ]; then
+                ynh_die "PHP is required for $mode mode. Please select a PHP version."
+            fi
+            ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+            ynh_add_fpm_config --phpversion=$phpversion
+        elif [ "$phpversion" == "none" ]
         then
             ynh_delete_file_checksum --file="$nginx_extra_conf_dir/php.conf"
             ynh_secure_remove --file="$nginx_extra_conf_dir/php.conf"
@@ -141,6 +149,15 @@ ynh_app_config_apply() {
         
         # Backup current configuration
         ynh_backup_before_upgrade
+        
+        # Ensure PHP is configured for front-controller and framework modes
+        if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
+            if [ "$phpversion" == "none" ]; then
+                ynh_die "PHP is required for $mode mode. Please select a PHP version."
+            fi
+            ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+            ynh_add_fpm_config --phpversion=$phpversion
+        fi
         
         # Reconfigure nginx based on new mode
         if [ "$mode" == "static" ]; then

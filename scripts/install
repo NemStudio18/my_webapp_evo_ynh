@@ -76,7 +76,14 @@ nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
 mkdir -p "$nginx_extra_conf_dir"
 
 # Prepare nginx extra conf
-if [ $phpversion != "none" ]
+# For front-controller and framework modes, PHP is required
+if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
+    if [ $phpversion == "none" ]; then
+        ynh_die "PHP is required for $mode mode. Please select a PHP version."
+    fi
+    ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+    YNH_PHP_VERSION="$phpversion"
+elif [ $phpversion != "none" ]
 then
     ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
     YNH_PHP_VERSION="$phpversion"
