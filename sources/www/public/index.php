@@ -10,25 +10,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Get the request URI
-$request_uri = $_SERVER['REQUEST_URI'];
-$path = parse_url($request_uri, PHP_URL_PATH);
-
-// Remove the path prefix if it exists
-$path_prefix = $_SERVER['SCRIPT_NAME'];
-if (strpos($path, $path_prefix) === 0) {
-    $path = substr($path, strlen($path_prefix));
-}
-
-// Remove leading slash
-$path = ltrim($path, '/');
-
-// Simple routing example
-switch ($path) {
-    case '':
-    case 'index.php':
-        // Home page
-        echo '<!DOCTYPE html>
+echo '<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -136,50 +118,20 @@ switch ($path) {
             font-size: 1.2rem;
         }
         
-        .info p {
-            margin-bottom: 0.5rem;
-            font-family: "Courier New", monospace;
-            background: #f8f9fa;
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            border: 1px solid #dee2e6;
-        }
-        
-        .routes {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 1.5rem;
-            border-radius: 6px;
-            margin: 1.5rem 0;
-        }
-        
-        .routes h3 {
-            color: #155724;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-        
-        .routes ul {
-            list-style: none;
+        .info dl {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem 1rem;
+            margin-top: 1rem;
         }
         
-        .routes li a {
-            display: block;
-            padding: 1rem;
-            background: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            text-align: center;
-            transition: background-color 0.2s ease;
+        .info dt {
+            font-weight: 600;
+            color: #495057;
         }
         
-        .routes li a:hover {
-            background: #218838;
+        .info dd {
+            color: #6c757d;
         }
         
         .benefits {
@@ -212,6 +164,21 @@ switch ($path) {
             font-weight: bold;
             position: absolute;
             left: 0;
+        }
+        
+        .cat-section {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .cat-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-top: 1rem;
         }
         
         .link {
@@ -254,22 +221,17 @@ switch ($path) {
             <p>This structure provides better security by separating public files from application logic.</p>
             
             <div class="info">
-                <h3><i class="fas fa-info-circle"></i> Current Request Info</h3>
-                <p><strong>Request URI:</strong> ' . htmlspecialchars($request_uri) . '</p>
-                <p><strong>Path:</strong> ' . htmlspecialchars($path) . '</p>
-                <p><strong>Method:</strong> ' . htmlspecialchars($_SERVER['REQUEST_METHOD']) . '</p>
-                <p><strong>Document Root:</strong> ' . htmlspecialchars($_SERVER['DOCUMENT_ROOT']) . '</p>
-            </div>
-            
-            <div class="routes">
-                <h3><i class="fas fa-link"></i> Example Routes</h3>
-                <p>Try these URLs to see the routing in action:</p>
-                <ul>
-                    <li><a href="' . htmlspecialchars($path_prefix) . '"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="' . htmlspecialchars($path_prefix) . 'about"><i class="fas fa-info-circle"></i> About</a></li>
-                    <li><a href="' . htmlspecialchars($path_prefix) . 'contact"><i class="fas fa-envelope"></i> Contact</a></li>
-                    <li><a href="' . htmlspecialchars($path_prefix) . 'api/test"><i class="fas fa-code"></i> API Test</a></li>
-                </ul>
+                <h3><i class="fas fa-server"></i> SFTP Connection Details</h3>
+                <dl>
+                    <dt>Domain</dt>
+                    <dd>__DOMAIN__</dd>
+                    <dt>Port</dt>
+                    <dd>__SSH_PORT__</dd>
+                    <dt>User</dt>
+                    <dd>__ID__</dd>
+                    <dt>Password</dt>
+                    <dd><em>the one you set at installation (or your account password if none was set)</em></dd>
+                </dl>
             </div>
             
             <div class="benefits">
@@ -282,103 +244,12 @@ switch ($path) {
                 </ul>
             </div>
         </div>
-    </div>
-</body>
-</html>';
-        break;
         
-    case 'about':
-        echo '<!DOCTYPE html>
-<html>
-<head>
-    <title>About - FlexWebApp Framework</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>About</h1>
-        </div>
-        <div class="content">
-            <p>This is the About page in framework mode. You can customize this content as needed.</p>
-            <p><a href="' . htmlspecialchars($path_prefix) . '">← Back to Home</a></p>
+        <div class="cat-section">
+            <p><i class="fas fa-gift"></i> As a reward, here is a random cat picture:</p>
+            <img src="https://thecatapi.com/api/images/get?format=src&type=gif" alt="Random cat">
         </div>
     </div>
 </body>
 </html>';
-        break;
-        
-    case 'contact':
-        echo '<!DOCTYPE html>
-<html>
-<head>
-    <title>Contact - FlexWebApp Framework</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Contact</h1>
-        </div>
-        <div class="content">
-            <p>This is the Contact page in framework mode. You can add a contact form here.</p>
-            <p><a href="' . htmlspecialchars($path_prefix) . '">← Back to Home</a></p>
-        </div>
-    </div>
-</body>
-</html>';
-        break;
-        
-    case 'api/test':
-        // API endpoint example
-        header('Content-Type: application/json');
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'API is working in framework mode!',
-            'request_uri' => $request_uri,
-            'path' => $path,
-            'method' => $_SERVER['REQUEST_METHOD'],
-            'mode' => 'framework',
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        break;
-        
-    default:
-        // 404 Not Found
-        http_response_code(404);
-        echo '<!DOCTYPE html>
-<html>
-<head>
-    <title>404 Not Found - FlexWebApp Framework</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: #ffebee; padding: 20px; border-radius: 5px; }
-        .content { margin: 20px 0; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>404 - Page Not Found</h1>
-        </div>
-        <div class="content">
-            <p>The requested page "' . htmlspecialchars($path) . '" was not found.</p>
-            <p><a href="' . htmlspecialchars($path_prefix) . '">← Back to Home</a></p>
-        </div>
-    </div>
-</body>
-</html>';
-        break;
-}
 ?>
