@@ -1,6 +1,6 @@
-# FlexWebApp - Framework d'Application Web Moderne
+# My Webapp - Framework d'Application Web Moderne
 
-FlexWebApp est un framework d'application web polyvalent qui vous permet de déployer facilement vos sites web personnalisés avec plusieurs modes de déploiement adaptés à vos besoins.
+My Webapp est un framework d'application web polyvalent qui vous permet de déployer facilement vos sites web personnalisés avec plusieurs modes de déploiement adaptés à vos besoins.
 
 ## ▶️ Modes de Déploiement Multiples
 
@@ -32,4 +32,4 @@ Activez des pages d'erreur 404 personnalisées via le panneau de configuration. 
 
 ## 🔒 Sécurité et Performance
 
-Conçu avec la sécurité et la performance à l'esprit, FlexWebApp fournit une base robuste pour vos projets web avec des sauvegardes automatiques et des configurations optimisées. 
+Conçu avec la sécurité et la performance à l'esprit, My Webapp fournit une base robuste pour vos projets web avec des sauvegardes automatiques et des configurations optimisées. 
