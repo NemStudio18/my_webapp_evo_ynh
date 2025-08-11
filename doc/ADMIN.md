@@ -6,138 +6,117 @@ FlexWebApp is a flexible web application framework that provides multiple deploy
 
 FlexWebApp creates a clean web application structure where you can add your own content (HTML, CSS, PHP, etc.) inside `__INSTALL_DIR__/www/`. The most common way to manage your files is through SFTP.
 
+## 🎯 Application Modes
+
+FlexWebApp supports three deployment modes, each with optimized Nginx configurations:
+
+### 📄 Static Mode
+- **Purpose**: Basic static file serving (HTML, CSS, JS, images)
+- **Web Root**: `__INSTALL_DIR__/www/`
+- **Features**: 
+  - Direct file serving
+  - Enhanced security (blocks .php, .json, .tpl, .ini, .env files)
+  - Hidden file protection
+  - Optimized logging
+
+### 🚀 Front Controller Mode
+- **Purpose**: PHP applications with single entry point
+- **Web Root**: `__INSTALL_DIR__/www/`
+- **Front Controller**: `index.php` at root
+- **Features**:
+  - All requests routed through `index.php`
+  - Static files served directly when they exist
+  - Enhanced security (blocks sensitive file types)
+  - Advanced routing capabilities
+
+### 🏗️ Framework Mode
+- **Purpose**: Modern framework structure with public web root
+- **Web Root**: `__INSTALL_DIR__/www/public/`
+- **Front Controller**: `public/index.php`
+- **Features**:
+  - Secure separation of public and private files
+  - All requests routed through `public/index.php`
+  - Enhanced security (blocks sensitive file types)
+  - Framework-compatible structure
+
+### 🔒 Security Features (All Modes)
+- **File Protection**: Blocks access to sensitive extensions
+- **Hidden Files**: Denies access to hidden files (except .well-known)
+- **Directory Listing**: Disabled for security
+- **Optimized Logging**: Reduces unnecessary log entries
+
 ## 📁 File Management via SFTP
 
 ### Connection Details
-
-Once installed, visit your application URL to get the SFTP connection information:
-
-- **Host**: `__DOMAIN__`
-- **Username**: `__ID__`
-- **Password**: Password set during installation
-- **Port**: 22 (unless you changed the SSH port)
-
-### SFTP Clients
-
-You can connect using any SFTP client:
-- **Windows/Mac/Linux**: [FileZilla](https://filezilla-project.org/)
-- **Mac**: Built-in Finder (Go > Connect to Server)
-- **Linux**: File manager with SFTP support
+- **Domain**: `__DOMAIN__`
+- **Port**: `__SSH_PORT__`
+- **User**: `__ID__`
+- **Password**: the one you set at installation (or your account password if none was set)
 
 ### Managing SFTP Access
 
 #### Forgot Your Password?
+If you've forgotten your SFTP password, you can reset it through the configuration panel in YunoHost's admin interface.
 
-If you forgot your SFTP password, you can change it in YunoHost's web admin interface:
-1. Go to **Apps > FlexWebApp > FlexWebApp configuration**
-2. Update the SFTP password
-3. Verify that SFTP is enabled
+#### Adding Custom Folders and Files
+You can create any folder structure you want in your `www` directory:
+```
+www/
+├── css/          ← Your stylesheets
+├── js/           ← Your JavaScript files
+├── images/       ← Your images
+├── pages/        ← Custom HTML pages
+├── api/          ← API endpoints (if using PHP)
+└── uploads/      ← User uploads
+```
+
+#### Creating Real Pages
+To create actual pages that Nginx will serve:
+- **HTML pages**: Create `.html` files (e.g., `about.html`, `contact.html`)
+- **PHP pages**: Create `.php` files (e.g., `api.php`, `dashboard.php`)
+- **Static assets**: Place CSS, JS, and images in appropriate folders
+
+> 💡 **Note**: In front-controller and framework modes, only files that don't exist will be routed through the PHP front controller.
 
 ## 💻 Command Line Access
 
 Starting with YunoHost v11.1.21, you can access your application via command line:
-
 ```bash
-sudo yunohost app shell __APP__
+yunohost app shell flexwebapp
 ```
-
-This gives you direct access as the application user. The `php` command will point to the PHP version installed for your app.
 
 ## 📂 File Structure
 
 After connecting, you'll see a `www` folder containing the public files served by your application. This is where you should place all your web application files.
 
-### Application Modes
-
-Depending on your installation mode, your files should be organized as follows:
-
-- **Static Mode**: Place files directly in `www/`
-- **Front Controller Mode**: Place `index.php` in `www/` root
-- **Framework Mode**: Place files in `www/public/` with `index.php` as front controller
-
-### Adding Custom Folders and Files
-
-You can create any folder structure within `www/` to organize your application:
-
-```
-www/
-├── index.php              # Front controller (Front Controller Mode)
-├── assets/                # CSS, JS, images
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── uploads/               # User uploaded files
-├── templates/             # HTML templates
-├── includes/              # PHP includes
-├── api/                   # API endpoints
-├── admin/                 # Administration area
-├── config/                # Configuration files
-├── src/                   # Source code
-├── app/                   # Application logic
-└── vendor/                # Dependencies (Composer)
-```
-
-**Note**: All files in `www/` are publicly accessible. Keep sensitive files outside this directory.
-
-### Creating Real Pages
-
-In Front Controller mode, you can create actual HTML files that will be served directly:
-
-```
-www/
-├── index.php              # Front controller (handles routing)
-├── about.html             # Real about page (served directly)
-├── contact.html           # Real contact page (served directly)
-├── assets/                # CSS, JS, images
-│   ├── css/
-│   ├── js/
-│   └── images/
-└── api/                   # API endpoints
-    └── test.php           # Real API endpoint
-```
-
-**Important**: Static files (`.html`, `.css`, `.js`, images) are served directly by Nginx. Only PHP files and non-existent paths are routed through `index.php`.
-
 ## ⚠️ Error Handling
 
 ### Custom Error Pages
-
-FlexWebApp supports custom error page handling for HTTP errors 403 and 404:
-
-1. Create an `error` folder at `__INSTALL_DIR__/www/error/`
-2. Add your custom error pages:
-   - `403.html` for "Access Denied" errors
-   - `404.html` for "Not Found" errors
-
-### Enabling Error Pages
-
-Enable custom error pages through the configuration panel in YunoHost's web admin interface.
+Create an `error` folder in your `www` directory and add custom error pages:
+- `404.html` - Page not found
+- `500.html` - Server error
+- `403.html` - Access forbidden
 
 ## ⚙️ Advanced Configuration
 
 ### Customizing Nginx Configuration
-
-If you need to customize the Nginx configuration:
-
-1. Edit `/etc/nginx/conf.d/__DOMAIN__.d/__ID__.d/YOUR_CUSTOM_FILE.conf`
-2. Ensure the file has a `.conf` extension
-3. Test the configuration: `nginx -t`
-4. Reload Nginx: `systemctl reload nginx`
+You can add custom Nginx configurations by creating `.conf` files in the `conf/` directory. These will be automatically included.
 
 > 💡 **Tip**: Always test your Nginx configuration before reloading to avoid breaking your site.
 
 ## 🔧 Configuration Panel
 
 Access the configuration panel in YunoHost's web admin to:
-- Change SFTP password
-- Enable/disable SFTP access
-- Switch between application modes
-- Configure custom error pages
-- Manage PHP settings
+- **Change application mode** between static, front-controller, and framework
+- **Enable/disable SFTP access**
+- **Reset SFTP password**
+- **Configure custom error pages**
+- **Manage PHP version**
 
 ## 📚 Best Practices
 
 - **Backup regularly**: Your files are automatically backed up with YunoHost
-- **Use version control**: Consider using Git for your web application files
-- **Test changes**: Always test modifications in a development environment first
-- **Keep PHP updated**: Regularly update your PHP version for security
+- **Use appropriate mode**: Choose the mode that best fits your project needs
+- **Keep sensitive files outside web root**: In framework mode, use the `public/` folder structure
+- **Test configurations**: Always test Nginx configurations before applying
+- **Monitor logs**: Check application logs for any issues
