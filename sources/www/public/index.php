@@ -15,7 +15,7 @@ echo '<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlexWebApp - Framework Mode</title>
+    <title>My Webapp - Framework Mode</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -194,7 +194,7 @@ echo '<!DOCTYPE html>
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-layer-group"></i> FlexWebApp - Framework Mode</h1>
+            <h1><i class="fas fa-layer-group"></i> My Webapp - Framework Mode</h1>
             <p>Welcome to your application running in framework mode!</p>
         </div>
         

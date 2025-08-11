@@ -1,8 +1,8 @@
 version = "1.0"
 
 [main]
-name.en = "FlexWebApp configuration"
-name.fr = "Configuration de FlexWebApp"
+name.en = "My Webapp configuration"
+name.fr = "Configuration de My Webapp"
 
     [main.sftp]
     name.en = "SFTP access"

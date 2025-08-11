@@ -1,10 +1,10 @@
-# Guide d'Administration FlexWebApp
+# Guide d'Administration My Webapp
 
-FlexWebApp est un framework d'application web flexible qui propose plusieurs modes de déploiement. Ce guide vous aidera à gérer votre application efficacement.
+My Webapp est un framework d'application web flexible qui propose plusieurs modes de déploiement. Ce guide vous aidera à gérer votre application efficacement.
 
 ## ▶️ Premiers Pas
 
-FlexWebApp crée une structure d'application web propre où vous pouvez ajouter votre propre contenu (HTML, CSS, PHP, etc.) à l'intérieur de `__INSTALL_DIR__/www/`. La méthode la plus courante pour gérer vos fichiers est via SFTP.
+My Webapp crée une structure d'application web propre où vous pouvez ajouter votre propre contenu (HTML, CSS, PHP, etc.) à l'intérieur de `__INSTALL_DIR__/www/`. La méthode la plus courante pour gérer vos fichiers est via SFTP.
 
 ## 📁 Gestion des Fichiers via SFTP
 
@@ -29,7 +29,7 @@ Vous pouvez vous connecter avec n'importe quel client SFTP :
 #### Mot de Passe Oublié ?
 
 Si vous avez oublié votre mot de passe SFTP, vous pouvez le changer dans l'interface web admin de YunoHost :
-1. Allez dans **Applications > FlexWebApp > Configuration FlexWebApp**
+1. Allez dans **Applications > My Webapp > Configuration My Webapp**
 2. Mettez à jour le mot de passe SFTP
 3. Vérifiez que SFTP est activé
 
@@ -102,7 +102,7 @@ www/
 
 ### Pages d'Erreur Personnalisées
 
-FlexWebApp prend en charge la gestion des pages d'erreur personnalisées pour les erreurs HTTP 403 et 404 :
+My Webapp prend en charge la gestion des pages d'erreur personnalisées pour les erreurs HTTP 403 et 404 :
 
 1. Créez un dossier `error` à `__INSTALL_DIR__/www/error/`
 2. Ajoutez vos pages d'erreur personnalisées :
