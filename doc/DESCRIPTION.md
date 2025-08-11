@@ -6,17 +6,9 @@ FlexWebApp is a versatile web application framework that allows you to easily de
 
 Choose the deployment mode that best fits your project:
 
-- **Static Mode**: Basic static file serving with enhanced security
-- **Front Controller Mode**: PHP front controller at root with advanced routing
+- **Static Mode**: Perfect for static websites with HTML, CSS, and JavaScript
+- **Front Controller Mode**: Ideal for PHP applications with a single entry point at the root
 - **Framework Mode**: Modern framework structure with a dedicated `public/` directory
-
-### 🔒 Security Features
-
-All modes include enhanced security configurations:
-- **File protection**: Blocks access to sensitive extensions (.json, .tpl, .ini, .env)
-- **Hidden file protection**: Denies access to hidden files (except .well-known)
-- **Directory listing disabled**: Prevents directory browsing
-- **Optimized logging**: Reduces unnecessary log entries
 
 ## 📁 File Management
 
