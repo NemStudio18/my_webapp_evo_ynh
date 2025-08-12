@@ -18,6 +18,9 @@ ynh_abort_if_errors
 install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path=$(ynh_app_setting_get --app=$app --key=path)
+# --- Définitions par défaut pour éviter "variable sans liaison" (set -u)
+: "${nginx_extra_conf_dir:=/etc/nginx/conf.d/${domain}.d/${app}.d}"
+mkdir -p "$nginx_extra_conf_dir" 2>/dev/null || true
 
 #=================================================
 # SPECIFIC GETTERS FOR TOML SHORT KEY
