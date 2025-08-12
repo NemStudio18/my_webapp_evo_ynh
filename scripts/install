@@ -3,6 +3,8 @@
 #=================================================
 # GENERIC START
 #=================================================
+set -eu
+
 # IMPORT GENERIC HELPERS
 #=================================================
 
@@ -14,6 +16,11 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 password=$YNH_APP_ARG_PASSWORD
+mode=$YNH_APP_ARG_MODE
+phpversion=$YNH_APP_ARG_PHPVERSION
+database=$YNH_APP_ARG_DATABASE
+with_sftp=$YNH_APP_ARG_WITH_SFTP
+custom_error_file=$YNH_APP_ARG_CUSTOM_ERROR_FILE
 app_nb=$YNH_APP_INSTANCE_NUMBER
 ssh_port=$(grep "^Port" /etc/ssh/sshd_config | awk '{print $2}')
 
@@ -23,18 +30,14 @@ ssh_port=$(grep "^Port" /etc/ssh/sshd_config | awk '{print $2}')
 ynh_script_progression --message="Validating installation parameters..." --weight=2
 
 # Set default password for SFTP if not provided
-if [ $with_sftp -eq 1 ] && [ "$password" == "" ]; then
-    # Use the current user's password as default for SFTP
-    password=$(ynh_app_setting_get --app=$app --key=password)
-    if [ "$password" == "" ]; then
-        # If still empty, generate a random password
-        password=$(ynh_string_random --length=12)
-    fi
+if [ "$with_sftp" -eq 1 ] && [ "$password" = "" ]; then
+    # Generate a random password for SFTP
+    password=$(ynh_string_random --length=12)
 fi
 
 # Validate mode requirements
-if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
-    if [ "$phpversion" == "none" ]; then
+if [ "$mode" = "front-controller" ] || [ "$mode" = "framework" ]; then
+    if [ "$phpversion" = "none" ]; then
         ynh_die --message="PHP is required for $mode mode. Please select a PHP version."
     fi
 fi
@@ -44,26 +47,26 @@ fi
 #=================================================
 ynh_script_progression --message="Storing installation settings..." --weight=1
 
-ynh_app_setting_set --app=$app --key=password --value=$password
+ynh_app_setting_set --app="$app" --key=password --value="$password"
 
 #=================================================
 # CREATE A MYSQL DATABASE
 #=================================================
 
-if [ $database != "none" ]; then
+if [ "$database" != "none" ]; then
     ynh_script_progression --message="Creating a database..." --weight=2
 
-    db_name=$(ynh_sanitize_dbid --db_name=$app)
-    db_user=$db_name
+    db_name=$(ynh_sanitize_dbid --db_name="$app")
+    db_user="$db_name"
     db_pwd=$(ynh_string_random --length=30)
-    ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-    ynh_app_setting_set --app=$app --key=db_user --value=$db_user
-    ynh_app_setting_set --app=$app --key=db_pwd --value=$db_pwd
+    ynh_app_setting_set --app="$app" --key=db_name --value="$db_name"
+    ynh_app_setting_set --app="$app" --key=db_user --value="$db_user"
+    ynh_app_setting_set --app="$app" --key=db_pwd --value="$db_pwd"
 
-    if [ $database == "mysql" ]; then
-        ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
-    elif [ $database == "postgresql" ]; then
-        ynh_psql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
+    if [ "$database" = "mysql" ]; then
+        ynh_mysql_setup_db --db_user="$db_user" --db_name="$db_name" --db_pwd="$db_pwd"
+    elif [ "$database" = "postgresql" ]; then
+        ynh_psql_setup_db --db_user="$db_user" --db_name="$db_name" --db_pwd="$db_pwd"
     fi
 fi
 
@@ -77,19 +80,19 @@ mkdir -p "$nginx_extra_conf_dir"
 
 # Prepare nginx extra conf
 # For front-controller and framework modes, PHP is required
-if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
-    if [ $phpversion == "none" ]; then
+if [ "$mode" = "front-controller" ] || [ "$mode" = "framework" ]; then
+    if [ "$phpversion" = "none" ]; then
         ynh_die "PHP is required for $mode mode. Please select a PHP version."
     fi
     ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
     YNH_PHP_VERSION="$phpversion"
-elif [ $phpversion != "none" ]
+elif [ "$phpversion" != "none" ]
 then
     ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
     YNH_PHP_VERSION="$phpversion"
 fi
 
-if [ $custom_error_file -eq 1 ]
+if [ "$custom_error_file" -eq 1 ]
 then
     # Add the custom error build with the application
     ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
@@ -97,11 +100,11 @@ fi
 
 
 # Create a dedicated NGINX config based on mode
-if [ "$mode" == "static" ]; then
+if [ "$mode" = "static" ]; then
     ynh_add_nginx_config
-elif [ "$mode" == "front-controller" ]; then
+elif [ "$mode" = "front-controller" ]; then
     ynh_add_nginx_config --template="nginx-front-controller.conf"
-elif [ "$mode" == "framework" ]; then
+elif [ "$mode" = "framework" ]; then
     ynh_add_nginx_config --template="nginx-framework.conf"
 else
     # Default to static mode
@@ -117,12 +120,12 @@ fi
 
 if [ "$mode" != "front-controller" ]; then
     # Remove nginx-front-controller.conf if it was copied
-    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-front-controller.conf"
+    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-framework.conf"
 fi
 
 if [ "$mode" != "framework" ]; then
     # Remove nginx-framework.conf if it was copied
-    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-framework.conf"
+    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-front-controller.conf"
 fi
 
 ynh_add_config --template="example-custom-nginx-config.conf" --destination="$nginx_extra_conf_dir/sample.conf"
@@ -132,16 +135,16 @@ ynh_add_config --template="example-custom-nginx-config.conf" --destination="$ngi
 #=================================================
 ynh_script_progression --message="Configuring system user..."
 
-if [ $with_sftp -eq 1 ]
+if [ "$with_sftp" -eq 1 ]
 then
     groups="sftp.app"
 else
     groups=""
 fi
 
-    ynh_system_user_create --username=$app --home_dir="$install_dir" --groups="$groups"
+    ynh_system_user_create --username="$app" --home_dir="$install_dir" --groups="$groups"
 
-if [ $with_sftp -eq 1 ]
+if [ "$with_sftp" -eq 1 ]
 then
     # Add the password to this user
     chpasswd <<< "${app}:${password}"
@@ -156,16 +159,16 @@ fi
 mkdir -p "$install_dir/www"
 
 # Create structure based on mode
-if [ "$mode" == "static" ]; then
+if [ "$mode" = "static" ]; then
     # Static mode - use original files
     ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
-elif [ "$mode" == "front-controller" ]; then
+elif [ "$mode" = "front-controller" ]; then
     # Front controller mode - create index.php and structure
     ynh_add_config --template="../sources/www/index.php" --destination="$install_dir/www/index.php"
     mkdir -p "$install_dir/www/config"
     mkdir -p "$install_dir/www/src"
     mkdir -p "$install_dir/www/app"
-elif [ "$mode" == "framework" ]; then
+elif [ "$mode" = "framework" ]; then
     # Framework mode - create public structure
     mkdir -p "$install_dir/www/public"
     ynh_add_config --template="../sources/www/public/index.php" --destination="$install_dir/www/public/index.php"
@@ -173,17 +176,17 @@ elif [ "$mode" == "framework" ]; then
     mkdir -p "$install_dir/www/config"
     mkdir -p "$install_dir/www/src"
     mkdir -p "$install_dir/www/vendor"
-    mkdir -p "$install_dir/www/storage"
+    mkdir -p "$install_dir/www/public/storage"
 else
     # Default to static mode
     ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
 fi
 
-chown -R $app:www-data "$install_dir"
+chown -R "$app:www-data" "$install_dir"
 # Home directory of the user needs to be owned by root to allow
 # SFTP connections
 chown root:root "$install_dir"
-setfacl -m g:$app:r-x "$install_dir"
+setfacl -m g:"$app":r-x "$install_dir"
 setfacl -m g:www-data:r-x "$install_dir"
 chmod 750 "$install_dir"
 
@@ -191,7 +194,7 @@ chmod 750 "$install_dir"
 # PHP-FPM CONFIGURATION
 #=================================================
 
-if [ $phpversion != "none" ]
+if [ "$phpversion" != "none" ]
 then
     ynh_script_progression --message="Configuring PHP-FPM..." --weight=2
 

@@ -3,6 +3,8 @@
 #=================================================
 # GENERIC STARTING
 #=================================================
+set -eu
+
 # IMPORT GENERIC HELPERS
 #=================================================
 
@@ -15,9 +17,16 @@ ynh_abort_if_errors
 # RETRIEVE ARGUMENTS
 #=================================================
 
-install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-path=$(ynh_app_setting_get --app=$app --key=path)
+install_dir=$(ynh_app_setting_get --app="$app" --key=install_dir)
+domain=$(ynh_app_setting_get --app="$app" --key=domain)
+path=$(ynh_app_setting_get --app="$app" --key=path)
+
+# Get current settings for comparison
+mode=$(ynh_app_setting_get --app="$app" --key=mode)
+phpversion=$(ynh_app_setting_get --app="$app" --key=phpversion)
+database=$(ynh_app_setting_get --app="$app" --key=database)
+with_sftp=$(ynh_app_setting_get --app="$app" --key=with_sftp)
+custom_error_file=$(ynh_app_setting_get --app="$app" --key=custom_error_file)
 
 #=================================================
 # SPECIFIC GETTERS FOR TOML SHORT KEY
@@ -32,9 +41,9 @@ path=$(ynh_app_setting_get --app=$app --key=path)
 #=================================================
 
 set__password() {
-    if [ ! "$password" == "" ]
+    if [ ! "$password" = "" ]
     then
-        ynh_app_setting_set --app=$app --key=password --value="$password"
+        ynh_app_setting_set --app="$app" --key=password --value="$password"
     fi
 }
 
@@ -46,15 +55,15 @@ ynh_app_config_validate() {
     _ynh_app_config_validate
 
     # Set default password for SFTP if not provided
-    if [ "${changed[with_sftp]}" == "true" ] && [ $with_sftp -eq 1 ] && [ "$password" == "" ]; then
+    if [ "${changed[with_sftp]}" = "true" ] && [ "$with_sftp" -eq 1 ] && [ "$password" = "" ]; then
         # Generate a random password if none provided
         password=$(ynh_string_random --length=12)
     fi
 
     # Validate mode requirements
-    if [ "${changed[mode]}" == "true" ]; then
-        if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
-            if [ "$phpversion" == "none" ]; then
+    if [ "${changed[mode]}" = "true" ]; then
+        if [ "$mode" = "front-controller" ] || [ "$mode" = "framework" ]; then
+            if [ "$phpversion" = "none" ]; then
                 ynh_die --message="PHP is required for $mode mode. Please select a PHP version."
             fi
         fi
@@ -64,19 +73,19 @@ ynh_app_config_validate() {
 ynh_app_config_apply() {
     _ynh_app_config_apply
 
-    if [ "${changed[phpversion]}" == "true" ]
+    if [ "${changed[phpversion]}" = "true" ]
     then
         if [ "${old[phpversion]}" != "none" ]
         then
-            ynh_app_setting_set --app=$app --key=phpversion --value="${old[phpversion]}"
+            ynh_app_setting_set --app="$app" --key=phpversion --value="${old[phpversion]}"
             ynh_remove_fpm_config
         fi
         ynh_remove_app_dependencies
-        YNH_PHP_VERSION=$phpversion
+        YNH_PHP_VERSION="$phpversion"
         # ^ ynh_add_config replaces __PHPVERSION__ by __PHP_YNH_VERSION__...
-        ynh_app_setting_set --app=$app --key=phpversion --value="$phpversion"
+        ynh_app_setting_set --app="$app" --key=phpversion --value="$phpversion"
 
-        database=$(ynh_app_setting_get --app=$app --key=database)
+        database=$(ynh_app_setting_get --app="$app" --key=database)
         dependencies="$(ynh_read_manifest -k "resources.apt.packages")"
         dependencies_from_raw_bash=$(eval "$(ynh_read_manifest -k "resources.apt.packages_from_raw_bash")" | tr "\n" " ")
         ynh_install_app_dependencies "$dependencies $dependencies_from_raw_bash"
@@ -85,52 +94,52 @@ ynh_app_config_apply() {
         mkdir -p "$nginx_extra_conf_dir"
         
         # For front-controller and framework modes, PHP is required
-        if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
-            if [ "$phpversion" == "none" ]; then
+        if [ "$mode" = "front-controller" ] || [ "$mode" = "framework" ]; then
+            if [ "$phpversion" = "none" ]; then
                 ynh_die "PHP is required for $mode mode. Please select a PHP version."
             fi
             ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
-            ynh_add_fpm_config --phpversion=$phpversion
-        elif [ "$phpversion" == "none" ]
+            ynh_add_fpm_config --phpversion="$phpversion"
+        elif [ "$phpversion" = "none" ]
         then
             ynh_delete_file_checksum --file="$nginx_extra_conf_dir/php.conf"
             ynh_secure_remove --file="$nginx_extra_conf_dir/php.conf"
         else
             ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
-            ynh_add_fpm_config --phpversion=$phpversion
+            ynh_add_fpm_config --phpversion="$phpversion"
             # ^ the helper takes care of ynh_app_setting_set the phpversion
         fi
 
         ynh_add_nginx_config
     fi
 
-    if [ "${changed[with_sftp]}" == "true" ] && [ $with_sftp -eq 1 ]
+    if [ "${changed[with_sftp]}" = "true" ] && [ "$with_sftp" -eq 1 ]
     then
-        ynh_system_user_add_group --username=$app --groups="sftp.app"
+        ynh_system_user_add_group --username="$app" --groups="sftp.app"
 
-        if [ ! "$password" == "" ]
+        if [ ! "$password" = "" ]
         then
             chpasswd <<< "${app}:${password}"
         fi
-    elif [ "${changed[with_sftp]}" == "true" ] && [ $with_sftp -eq 0 ]
+    elif [ "${changed[with_sftp]}" = "true" ] && [ "$with_sftp" -eq 0 ]
     then
-        ynh_system_user_del_group --username=$app --groups="sftp.app"
+        ynh_system_user_del_group --username="$app" --groups="sftp.app"
     fi
     
-    if [ "${changed[password]}" == "true" ] && [ ! "$password" == "" ]
+    if [ "${changed[password]}" = "true" ] && [ ! "$password" = "" ]
     then
         chpasswd <<< "${app}:${password}"
     fi
 
-    if [ "${changed[custom_error_file]}" == "true" ]
+    if [ "${changed[custom_error_file]}" = "true" ]
     then
-        CUSTOM_ERROR_FILE=$custom_error_file
+        CUSTOM_ERROR_FILE="$custom_error_file"
         nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
 
-        if [ $custom_error_file -eq 1 ]
+        if [ "$custom_error_file" -eq 1 ]
         then
             ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
-        elif [ $custom_error_file -eq 0 ]
+        elif [ "$custom_error_file" -eq 0 ]
         then
             ynh_secure_remove --file="$nginx_extra_conf_dir/error-code.conf"
         fi
@@ -139,11 +148,11 @@ ynh_app_config_apply() {
 
     if [ "$phpversion" != "none" ]
     then
-        ynh_add_fpm_config --phpversion=$phpversion
+        ynh_add_fpm_config --phpversion="$phpversion"
     fi
 
     # Handle mode changes
-    if [ "${changed[mode]}" == "true" ]
+    if [ "${changed[mode]}" = "true" ]
     then
         ynh_script_progression --message="Changing application mode to $mode..." --weight=2
         
@@ -151,20 +160,20 @@ ynh_app_config_apply() {
         ynh_backup_before_upgrade
         
         # Ensure PHP is configured for front-controller and framework modes
-        if [ "$mode" == "front-controller" ] || [ "$mode" == "framework" ]; then
-            if [ "$phpversion" == "none" ]; then
+        if [ "$mode" = "front-controller" ] || [ "$mode" = "framework" ]; then
+            if [ "$phpversion" = "none" ]; then
                 ynh_die "PHP is required for $mode mode. Please select a PHP version."
             fi
             ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
-            ynh_add_fpm_config --phpversion=$phpversion
+            ynh_add_fpm_config --phpversion="$phpversion"
         fi
         
         # Reconfigure nginx based on new mode
-        if [ "$mode" == "static" ]; then
+        if [ "$mode" = "static" ]; then
             ynh_add_nginx_config
-        elif [ "$mode" == "front-controller" ]; then
+        elif [ "$mode" = "front-controller" ]; then
             ynh_add_nginx_config --template="nginx-front-controller.conf"
-        elif [ "$mode" == "framework" ]; then
+        elif [ "$mode" = "framework" ]; then
             ynh_add_nginx_config --template="nginx-framework.conf"
         fi
         
@@ -186,19 +195,19 @@ ynh_app_config_apply() {
         fi
         
         # Create appropriate file structure
-        install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+        install_dir=$(ynh_app_setting_get --app="$app" --key=install_dir)
         mkdir -p "$install_dir/www"
         
-        if [ "$mode" == "static" ]; then
+        if [ "$mode" = "static" ]; then
             # Static mode - use original files
             ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
-        elif [ "$mode" == "front-controller" ]; then
+        elif [ "$mode" = "front-controller" ]; then
             # Front controller mode - create index.php and structure
             ynh_add_config --template="../sources/www/index.php" --destination="$install_dir/www/index.php"
             mkdir -p "$install_dir/www/config"
             mkdir -p "$install_dir/www/src"
             mkdir -p "$install_dir/www/app"
-        elif [ "$mode" == "framework" ]; then
+        elif [ "$mode" = "framework" ]; then
             # Framework mode - create public structure
             mkdir -p "$install_dir/www/public"
             ynh_add_config --template="../sources/www/public/index.php" --destination="$install_dir/www/public/index.php"
@@ -206,11 +215,11 @@ ynh_app_config_apply() {
             mkdir -p "$install_dir/www/config"
             mkdir -p "$install_dir/www/src"
             mkdir -p "$install_dir/www/vendor"
-            mkdir -p "$install_dir/www/storage"
+            mkdir -p "$install_dir/www/public/storage"
         fi
         
         # Set proper permissions
-        chown -R $app:www-data "$install_dir/www"
+        chown -R "$app:www-data" "$install_dir/www"
         
         ynh_systemd_action --service_name=nginx --action=reload
     fi

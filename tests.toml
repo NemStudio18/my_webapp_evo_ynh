@@ -11,6 +11,7 @@ test_format = 1.0
     args.password = "SuperDuper_StrongPassw0rd"
     args.database = "none"
     args.phpversion = "8.3"
+    args.mode = "static"
     test_upgrade_from.bf5d3ed.name = "1.0~ynh14"
     test_upgrade_from.bf5d3ed.args.with_mysql = "0"
     test_upgrade_from.bf5d3ed.args.domain = "sub.domain.tld"
@@ -31,10 +32,35 @@ test_format = 1.0
 
     args.phpversion = "none"
 
+[static_mode_test]
+
+    args.mode = "static"
+    args.phpversion = "none"
+
+[front_controller_mode_test]
+
+    args.mode = "front-controller"
+    args.phpversion = "8.3"
+
+[framework_mode_test]
+
+    args.mode = "framework"
+    args.phpversion = "8.3"
+
+[sftp_no_password_test]
+
+    args.with_sftp = "1"
+    args.password = ""
+
+[sftp_disabled_test]
+
+    args.with_sftp = "0"
+
 [mysql_test]
 
     only = ["install.subdir", "backup_restore", "upgrade", "upgrade.bf5d3ed" ]
     args.database = "mysql"
+    args.mode = "static"
     test_upgrade_from.bf5d3ed.name = "1.0~ynh14"
     test_upgrade_from.bf5d3ed.args.with_mysql = "1"
     test_upgrade_from.bf5d3ed.args.domain = "sub.domain.tld"
@@ -45,12 +71,22 @@ test_format = 1.0
 
     only = ["install.subdir", "backup_restore", "upgrade" ]
     args.database = "postgresql"
+    args.mode = "static"
 
 [custom_error_file_test]
 
     args.custom_error_file = "1"
+    args.mode = "static"
     test_upgrade_from.bf5d3ed.name = "1.0~ynh14"
     test_upgrade_from.bf5d3ed.args.with_mysql = "0"
     test_upgrade_from.bf5d3ed.args.domain = "sub.domain.tld"
     test_upgrade_from.bf5d3ed.args.path = "/"
     test_upgrade_from.bf5d3ed.args.password = "SuperDuper_StrongPassw0rd"
+
+[comprehensive_test]
+
+    args.mode = "framework"
+    args.phpversion = "8.4"
+    args.database = "mysql"
+    args.with_sftp = "1"
+    args.custom_error_file = "1"
