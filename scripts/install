@@ -95,34 +95,14 @@ then
     ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
 fi
 
+# Install the main NGINX config (always the same)
+ynh_add_nginx_config
 
-# Create a dedicated NGINX config based on mode
-if [ "$mode" == "static" ]; then
-    ynh_add_nginx_config
-elif [ "$mode" == "front-controller" ]; then
-    ynh_add_nginx_config --template="nginx-front-controller.conf"
+# Install mode-specific rewrite configuration
+if [ "$mode" == "front-controller" ]; then
+    ynh_add_config --template="rewrite-front.conf" --destination="$nginx_extra_conf_dir/rewrite-front.conf"
 elif [ "$mode" == "framework" ]; then
-    ynh_add_nginx_config --template="nginx-framework.conf"
-else
-    # Default to static mode
-    ynh_add_nginx_config
-fi
-
-# Ensure only the correct template is used and clean up any unwanted templates
-# Remove any other main templates that might have been copied
-if [ "$mode" != "static" ]; then
-    # Remove nginx.conf if it was copied (should not happen, but safety check)
-    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx.conf"
-fi
-
-if [ "$mode" != "front-controller" ]; then
-    # Remove nginx-front-controller.conf if it was copied
-    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-front-controller.conf"
-fi
-
-if [ "$mode" != "framework" ]; then
-    # Remove nginx-framework.conf if it was copied
-    ynh_secure_remove --file="$nginx_extra_conf_dir/nginx-framework.conf"
+    ynh_add_config --template="rewrite-framework.conf" --destination="$nginx_extra_conf_dir/rewrite-framework.conf"
 fi
 
 ynh_add_config --template="example-custom-nginx-config.conf" --destination="$nginx_extra_conf_dir/sample.conf"
