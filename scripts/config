@@ -162,6 +162,9 @@ ynh_app_config_apply() {
             ynh_add_fpm_config --phpversion=$phpversion
         fi
         
+        # Set php_version variable for rewrite templates
+        php_version="$phpversion"
+        
         # Remove old rewrite configuration files
         ynh_secure_remove --file="$nginx_extra_conf_dir/rewrite-front.conf"
         ynh_secure_remove --file="$nginx_extra_conf_dir/rewrite-framework.conf"

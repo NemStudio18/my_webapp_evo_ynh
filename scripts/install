@@ -98,6 +98,9 @@ fi
 # Install the main NGINX config (always the same)
 ynh_add_nginx_config
 
+# Set php_version variable for rewrite templates
+php_version="$phpversion"
+
 # Install mode-specific rewrite configuration
 if [ "$mode" == "front-controller" ]; then
     ynh_add_config --template="rewrite-front.conf" --destination="$nginx_extra_conf_dir/rewrite-front.conf"
