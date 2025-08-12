@@ -102,7 +102,9 @@ ynh_add_nginx_config
 php_version="$phpversion"
 
 # Install mode-specific rewrite configuration
-if [ "$mode" == "front-controller" ]; then
+if [ "$mode" == "static" ]; then
+    ynh_add_config --template="rewrite-static.conf" --destination="$nginx_extra_conf_dir/rewrite-static.conf"
+elif [ "$mode" == "front-controller" ]; then
     ynh_add_config --template="rewrite-front.conf" --destination="$nginx_extra_conf_dir/rewrite-front.conf"
 elif [ "$mode" == "framework" ]; then
     ynh_add_config --template="rewrite-framework.conf" --destination="$nginx_extra_conf_dir/rewrite-framework.conf"
