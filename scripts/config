@@ -17,16 +17,10 @@ ynh_abort_if_errors
 # RETRIEVE ARGUMENTS
 #=================================================
 
+# Get current settings for comparison
 install_dir=$(ynh_app_setting_get --app="$app" --key=install_dir)
 domain=$(ynh_app_setting_get --app="$app" --key=domain)
 path=$(ynh_app_setting_get --app="$app" --key=path)
-
-# Get current settings for comparison
-mode=$(ynh_app_setting_get --app="$app" --key=mode)
-phpversion=$(ynh_app_setting_get --app="$app" --key=phpversion)
-database=$(ynh_app_setting_get --app="$app" --key=database)
-with_sftp=$(ynh_app_setting_get --app="$app" --key=with_sftp)
-custom_error_file=$(ynh_app_setting_get --app="$app" --key=custom_error_file)
 
 #=================================================
 # SPECIFIC GETTERS FOR TOML SHORT KEY
@@ -225,4 +219,4 @@ ynh_app_config_apply() {
     fi
 }
 
-ynh_app_config_run $1
+ynh_app_config_run "$1"
