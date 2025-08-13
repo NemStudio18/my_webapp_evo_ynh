@@ -39,8 +39,8 @@ ram.runtime = "50M"
     [install.password]
     type = "password"
     optional = true
-    help.en = "Optional: SFTP password. If empty and SFTP enabled, will use your current user password"
-    help.fr = "Optionnel: Mot de passe SFTP. Si vide et SFTP activé, utilisera votre mot de passe utilisateur actuel"
+    help.en = "Optional: SFTP password. If empty and SFTP enabled, will use your YunoHost account password"
+    help.fr = "Optionnel: Mot de passe SFTP. Si vide et SFTP activé, utilisera votre mot de passe de compte YunoHost"
 
     [install.init_main_permission]
     type = "group"
@@ -89,14 +89,6 @@ ram.runtime = "50M"
     en = "My Webapp is a flexible web application platform with three deployment modes: Classic (static files), CMS (WordPress/Drupal), and CMS-Public (Laravel/Symfony)."
     fr = "My Webapp est une plateforme d'application web flexible avec trois modes de déploiement : Classic (fichiers statiques), CMS (WordPress/Drupal), et CMS-Public (Laravel/Symfony)."
 
-    [documentation.quick_start]
-    en = "QUICK_START.md"
-    fr = "QUICK_START.md"
-
-    [documentation.examples]
-    en = "EXAMPLES.md"
-    fr = "EXAMPLES.md"
-
     [documentation.admin]
     en = "ADMIN.md"
     fr = "ADMIN_fr.md"
@@ -104,18 +96,6 @@ ram.runtime = "50M"
     [documentation.post_install]
     en = "POST_INSTALL.md"
     fr = "POST_INSTALL_fr.md"
-
-    [documentation.icons]
-    en = "ICONS.md"
-    fr = "ICONS.md"
-
-    [documentation.test]
-    en = "TEST_ACCESS.md"
-    fr = "TEST_ACCESS.md"
-
-    [documentation.readme]
-    en = "README.md"
-    fr = "README.md"
 
     [resources.apt]
     packages = "nginx"  # Kind of "dummy" value to be sure to have a non-empty dep list

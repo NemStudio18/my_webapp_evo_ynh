@@ -22,25 +22,15 @@ ssh_port=$(grep "^Port" /etc/ssh/sshd_config | awk '{print $2}')
 #=================================================
 ynh_script_progression --message="Validating installation parameters..." --weight=2
 
-# If SFTP is enabled but no password is provided, use the current user's password
+# If SFTP is enabled but no password is provided, inform user to use their YunoHost password
 if [ $with_sftp -eq 1 ] && [ "$password" = "" ]
 then
-    # Get the current user's password (the one installing the app)
-    echo "SFTP enabled but no password provided. Using current user's password for SFTP access."
-    password=$(ynh_app_setting_get --app=$app --key=admin_password 2>/dev/null || echo "")
+    echo "SFTP enabled but no password provided."
+    echo "The SFTP user will use the same password as your YunoHost user account."
+    echo "To connect via SFTP, use your YunoHost username and password."
     
-    # If still no password, prompt the user
-    if [ "$password" = "" ]
-    then
-        echo "Please enter your current user password for SFTP access:"
-        read -s password
-        echo ""
-        
-        if [ "$password" = "" ]
-        then
-            ynh_die --message="Password cannot be empty for SFTP access"
-        fi
-    fi
+    # Set a placeholder - the actual password will be the user's YunoHost password
+    password="__USE_YUNOHOST_PASSWORD__"
 fi
 
 #=================================================
