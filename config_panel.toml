@@ -1,49 +1,58 @@
 version = "1.0"
 
 [main]
-name = "My Webapp Configuration"
+name.en = "My Webapp configuration"
+name.fr = "Configuration de My Webapp"
 
-[main.mode]
-type = "select"
-ask.en = "Application Mode"
-ask.fr = "Mode de l'application"
-help.en = "Choose the application mode. Classic: Static files + PHP. CMS: Front controller for WordPress/Drupal. CMS-Public: Front controller for Laravel/Symfony with /public folder."
-help.fr = "Choisissez le mode de l'application. Classic: Fichiers statiques + PHP. CMS: Front controller pour WordPress/Drupal. CMS-Public: Front controller pour Laravel/Symfony avec dossier /public."
-choices = ["classic", "cms", "cms-public"]
-default = "classic"
+    [main.mode]
+    name.en = "Application Mode"
+    name.fr = "Mode de l'application"
+    
+        [main.mode.mode]
+        ask.en = "Choose the application mode"
+        ask.fr = "Choisissez le mode de l'application"
+        type = "select"
+        choices = ["classic", "cms", "cms-public"]
+        default = "classic"
+        help.en = "Classic: Static files + PHP. CMS: Front controller for WordPress/Drupal. CMS-Public: Front controller for Laravel/Symfony with /public folder."
+        help.fr = "Classic: Fichiers statiques + PHP. CMS: Front controller pour WordPress/Drupal. CMS-Public: Front controller pour Laravel/Symfony avec dossier /public."
 
-[main.phpversion]
-type = "select"
-ask.en = "PHP Version"
-ask.fr = "Version PHP"
-help.en = "Choose the PHP version for your application"
-help.fr = "Choisissez la version PHP pour votre application"
-choices = ["none", "7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]
-default = "8.4"
+    [main.sftp]
+    name.en = "SFTP access"
+    name.fr = "Accès SFTP"
 
-[main.custom_error_file]
-type = "boolean"
-ask.en = "Custom Error Pages"
-ask.fr = "Pages d'erreur personnalisées"
-help.en = "Enable custom 403/404 error pages"
-help.fr = "Activer les pages d'erreur 403/404 personnalisées"
-default = false
+        [main.sftp.with_sftp]
+        ask.en = "Do you need a SFTP access?"
+        ask.fr = "Avez-vous besoin d'un accès SFTP ?"
+        type = "boolean"
+        default = true
 
-[main.with_sftp]
-type = "boolean"
-ask.en = "SFTP Access"
-ask.fr = "Accès SFTP"
-help.en = "Enable SFTP access for file management"
-help.fr = "Activer l'accès SFTP pour la gestion des fichiers"
-default = true
+        [main.sftp.password]
+        ask.en = "Set a password for the SFTP access"
+        ask.fr = "Définir un mot de passe pour l'accès SFTP"
+        type = "password"
+        optional = true
+        visible = "with_sftp"
+        help.en = "If a password already exist, leave blank and it will not be replaced."
+        help.fr = "Si un mot de passe existe déjà, laissez vide et il ne sera pas remplacé."
 
-[main.password]
-type = "password"
-ask.en = "SFTP Password"
-ask.fr = "Mot de passe SFTP"
-help.en = "Password for SFTP access (leave empty to use YunoHost account password)"
-help.fr = "Mot de passe pour l'accès SFTP (laissez vide pour utiliser le mot de passe de votre compte YunoHost)"
-optional = true
+    [main.code_error]
+    name.en = "HTML Custom error"
+    name.fr = "Erreur personnalisée HTML"
 
-[main.actions]
-ynh_app_config_apply = "config"
+        [main.code_error.custom_error_file]
+        ask.en = "Activate the custom error file use"
+        ask.fr = "Activer l'utilisation du fichier d'erreur personnalisé"
+        type = "boolean"
+        default = false
+        help.en = "Once custom error enabled, you can add/create a custom `404.html` file in a directory `www\\error`."
+        help.fr = "Une fois l'erreur personnalisée activée, vous pouvez ajouter/créer un fichier `404.html` personnalisé dans un répertoire `www\\error`."
+
+    [main.php_fpm_config]
+    name = "PHP-FPM configuration"
+
+        [main.php_fpm_config.phpversion]
+        ask = "PHP version"
+        type = "select"
+        choices = ["none", "7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]
+        default = "none"

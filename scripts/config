@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #=================================================
-# GENERIC START
+# GENERIC STARTING
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
@@ -9,154 +9,173 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_script_progression --message="Loading current settings..." --weight=1
-
-# Load current settings
-current_mode=$(ynh_app_setting_get --app=$app --key=mode)
-current_phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-current_custom_error_file=$(ynh_app_setting_get --app=$app --key=custom_error_file)
-current_with_sftp=$(ynh_app_setting_get --app=$app --key=with_sftp)
-current_password=$(ynh_app_setting_get --app=$app --key=password)
+ynh_abort_if_errors
 
 #=================================================
-# BACKUP BEFORE MODIFICATIONS
+# RETRIEVE ARGUMENTS
 #=================================================
-ynh_script_progression --message="Creating backup before modifications..." --weight=1
 
-# Backup the app
-ynh_backup_create --include_backup=1 --include_app_dir=1
-
-#=================================================
-# GET NEW SETTINGS FROM ARGUMENTS
-#=================================================
-ynh_script_progression --message="Configuring new settings..." --weight=2
-
-# Get new settings from arguments
-new_mode=${1:-$current_mode}
-new_phpversion=${2:-$current_phpversion}
-new_custom_error_file=${3:-$current_custom_error_file}
-new_with_sftp=${4:-$current_with_sftp}
-new_password=${5:-$current_password}
-
-# If no arguments provided, show current settings
-if [ -z "$1" ] && [ -z "$2" ] && [ -z "$3" ] && [ -z "$4" ] && [ -z "$5" ]; then
-    ynh_print_info --message="Current configuration:"
-    ynh_print_info --message="  Mode: $current_mode"
-    ynh_print_info --message="  PHP Version: $current_phpversion"
-    ynh_print_info --message="  Custom Error Pages: $current_custom_error_file"
-    ynh_print_info --message="  SFTP Access: $current_with_sftp"
-    ynh_print_info --message="Usage: $0 [mode] [phpversion] [custom_error_file] [with_sftp] [password]"
-    ynh_print_info --message="Example: $0 cms 8.4 true true"
-    exit 0
-fi
-
-# Validate mode input
-if [[ ! "$new_mode" =~ ^(classic|cms|cms-public)$ ]]; then
-    ynh_die --message="Invalid mode: $new_mode. Please choose: classic, cms, or cms-public"
-fi
-
-# Validate PHP version input
-if [[ ! "$new_phpversion" =~ ^(none|7\.4|8\.0|8\.1|8\.2|8\.3|8\.4)$ ]]; then
-    ynh_die --message="Invalid PHP version: $new_phpversion"
-fi
-
-# Validate boolean inputs
-if [[ ! "$new_custom_error_file" =~ ^(true|false)$ ]]; then
-    ynh_die --message="Invalid custom_error_file value: $new_custom_error_file"
-fi
-
-if [[ ! "$new_with_sftp" =~ ^(true|false)$ ]]; then
-    ynh_die --message="Invalid with_sftp value: $new_with_sftp"
-fi
-
-ynh_print_info --message="Updating configuration:"
-ynh_print_info --message="  Mode: $current_mode -> $new_mode"
-ynh_print_info --message="  PHP Version: $current_phpversion -> $new_phpversion"
-ynh_print_info --message="  Custom Error Pages: $current_custom_error_file -> $new_custom_error_file"
-ynh_print_info --message="  SFTP Access: $current_with_sftp -> $new_with_sftp"
+install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path=$(ynh_app_setting_get --app=$app --key=path)
 
 #=================================================
-# UPDATE NGINX CONFIGURATION
+# SPECIFIC GETTERS FOR TOML SHORT KEY
 #=================================================
-ynh_script_progression --message="Updating Nginx configuration..." --weight=3
 
-nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
+#=================================================
+# SPECIFIC VALIDATORS FOR TOML SHORT KEYS
+#=================================================
 
-# Remove old mode-specific configurations
-rm -f "$nginx_extra_conf_dir/cms.conf"
-rm -f "$nginx_extra_conf_dir/cms-public.conf"
-rm -f "$nginx_extra_conf_dir/php.conf"
-rm -f "$nginx_extra_conf_dir/error-code.conf"
+#=================================================
+# SPECIFIC SETTERS FOR TOML SHORT KEYS
+#=================================================
 
-# Add new mode-specific configuration
-if [ "$new_mode" = "cms" ]
-then
-    # CMS mode: Add front controller pattern on top of base config
-    ynh_add_config --template="nginx-cms.conf" --destination="$nginx_extra_conf_dir/cms.conf"
-    
-elif [ "$new_mode" = "cms-public" ]
-then
-    # CMS-Public mode: Add front controller pattern pointing to /public folder
-    ynh_add_config --template="nginx-cms-public.conf" --destination="$nginx_extra_conf_dir/cms-public.conf"
-    
-    # Create public folder if it doesn't exist
-    if [ ! -d "$install_dir/www/public" ]; then
-        mkdir -p "$install_dir/www/public"
-        # Create a basic index.php in public folder
-        echo "<?php
+set__password() {
+    if [ ! "$password" == "" ]
+    then
+        ynh_app_setting_set --app=$app --key=password --value="$password"
+    fi
+}
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+
+ynh_app_config_validate() {
+    _ynh_app_config_validate
+
+    if [ "${changed[with_sftp]}" == "true" ] && [ $with_sftp -eq 1 ] && [ "$password" == "" ]
+    then
+        ynh_die --message="You need to set a password to enable SFTP"
+    fi
+}
+
+ynh_app_config_apply() {
+    _ynh_app_config_apply
+
+    # Handle mode changes
+    if [ "${changed[mode]}" == "true" ]
+    then
+        ynh_print_info --message="Changing application mode from '${old[mode]}' to '$mode'"
+        
+        nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
+        
+        # Remove old mode-specific configurations
+        rm -f "$nginx_extra_conf_dir/cms.conf"
+        rm -f "$nginx_extra_conf_dir/cms-public.conf"
+        rm -f "$nginx_extra_conf_dir/php.conf"
+        
+        # Add new mode-specific configuration
+        if [ "$mode" = "cms" ]
+        then
+            # CMS mode: Add front controller pattern on top of base config
+            ynh_add_config --template="nginx-cms.conf" --destination="$nginx_extra_conf_dir/cms.conf"
+            
+        elif [ "$mode" = "cms-public" ]
+        then
+            # CMS-Public mode: Add front controller pattern pointing to /public folder
+            ynh_add_config --template="nginx-cms-public.conf" --destination="$nginx_extra_conf_dir/cms-public.conf"
+            
+            # Create public folder if it doesn't exist
+            if [ ! -d "$install_dir/www/public" ]; then
+                mkdir -p "$install_dir/www/public"
+                # Create a basic index.php in public folder
+                echo "<?php
 // Front controller for CMS-Public mode
 // This file will be replaced by your actual CMS index.php
 echo 'CMS-Public mode is ready. Please upload your CMS files.';
 ?>" > "$install_dir/www/public/index.php"
+            fi
+            
+        else
+            # Classic mode: Standard PHP configuration
+            if [ "$phpversion" != "none" ]
+            then
+                ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+            fi
+        fi
+        
+        # Reload Nginx to apply new configuration
+        ynh_systemd_action --service_name=nginx --action=reload
+    fi
+
+    if [ "${changed[phpversion]}" == "true" ]
+    then
+        if [ "${old[phpversion]}" != "none" ]
+        then
+            ynh_app_setting_set --app=$app --key=phpversion --value="${old[phpversion]}"
+            ynh_remove_fpm_config
+        fi
+        ynh_remove_app_dependencies
+        YNH_PHP_VERSION=$phpversion
+        # ^ ynh_add_config replaces __PHPVERSION__ by __PHP_YNH_VERSION__...
+        ynh_app_setting_set --app=$app --key=phpversion --value="$phpversion"
+
+        database=$(ynh_app_setting_get --app=$app --key=database)
+        dependencies="$(ynh_read_manifest -k "resources.apt.packages")"
+        dependencies_from_raw_bash=$(eval "$(ynh_read_manifest -k "resources.apt.packages_from_raw_bash")" | tr "\n" " ")
+        ynh_install_app_dependencies "$dependencies $dependencies_from_raw_bash"
+
+        nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
+        mkdir -p "$nginx_extra_conf_dir"
+        if [ "$phpversion" == "none" ]
+        then
+            ynh_delete_file_checksum --file="$nginx_extra_conf_dir/php.conf"
+            ynh_secure_remove --file="$nginx_extra_conf_dir/php.conf"
+        else
+            # Only add PHP config if we're in classic mode
+            if [ "$mode" = "classic" ]
+            then
+                ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+            fi
+            ynh_add_fpm_config --phpversion=$phpversion
+            # ^ the helper takes care of ynh_app_setting_set the phpversion
+        fi
+
+        ynh_add_nginx_config
+    fi
+
+    if [ "${changed[with_sftp]}" == "true" ] && [ $with_sftp -eq 1 ]
+    then
+        ynh_system_user_add_group --username=$app --groups="sftp.app"
+
+        if [ ! "$password" == "" ]
+        then
+            chpasswd <<< "${app}:${password}"
+        fi
+    elif [ "${changed[with_sftp]}" == "true" ] && [ $with_sftp -eq 0 ]
+    then
+        ynh_system_user_del_group --username=$app --groups="sftp.app"
     fi
     
-else
-    # Classic mode: Standard PHP configuration
-    if [ "$new_phpversion" != "none" ]
+    if [ "${changed[password]}" == "true" ] && [ ! "$password" == "" ]
     then
-        ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+        chpasswd <<< "${app}:${password}"
     fi
-fi
 
-# Add custom error handling if enabled
-if [ "$new_custom_error_file" = "true" ]
-then
-    ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
-fi
+    if [ "${changed[custom_error_file]}" == "true" ]
+    then
+        CUSTOM_ERROR_FILE=$custom_error_file
+        nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
 
-#=================================================
-# UPDATE APP SETTINGS
-#=================================================
-ynh_script_progression --message="Updating application settings..." --weight=1
+        if [ $custom_error_file -eq 1 ]
+        then
+            ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+        elif [ $custom_error_file -eq 0 ]
+        then
+            ynh_secure_remove --file="$nginx_extra_conf_dir/error-code.conf"
+        fi
+        ynh_systemd_action --service_name=nginx --action=reload
+    fi
 
-# Store new settings
-ynh_app_setting_set --app=$app --key=mode --value="$new_mode"
-ynh_app_setting_set --app=$app --key=phpversion --value="$new_phpversion"
-ynh_app_setting_set --app=$app --key=custom_error_file --value="$new_custom_error_file"
-ynh_app_setting_set --app=$app --key=with_sftp --value="$new_with_sftp"
+    if [ "$phpversion" != "none" ]
+    then
+        ynh_add_fpm_config --phpversion=$phpversion
+    fi
+    
+    # Ensure mode is stored in app settings
+    ynh_app_setting_set --app=$app --key=mode --value="$mode"
+}
 
-# Update password if provided
-if [ -n "$new_password" ]; then
-    ynh_app_setting_set --app=$app --key=password --value="$new_password"
-fi
-
-#=================================================
-# RELOAD NGINX
-#=================================================
-ynh_script_progression --message="Reloading Nginx configuration..." --weight=1
-
-# Reload Nginx to apply new configuration
-systemctl reload nginx
-
-#=================================================
-# END OF SCRIPT
-#=================================================
-
-ynh_script_progression --message="Configuration update completed successfully" --last
-
-ynh_print_info --message="Configuration updated successfully!"
-ynh_print_info --message="Nginx configuration has been updated and reloaded"
-ynh_print_info --message="You can now access your application with the new configuration"
+ynh_app_config_run $1
