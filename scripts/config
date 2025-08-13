@@ -14,9 +14,12 @@ source /usr/share/yunohost/helpers
 #=================================================
 ynh_script_progression --message="Loading current settings..." --weight=1
 
-# Load current mode
+# Load current settings
 current_mode=$(ynh_app_setting_get --app=$app --key=mode)
 current_phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+current_custom_error_file=$(ynh_app_setting_get --app=$app --key=custom_error_file)
+current_with_sftp=$(ynh_app_setting_get --app=$app --key=with_sftp)
+current_password=$(ynh_app_setting_get --app=$app --key=password)
 
 #=================================================
 # BACKUP BEFORE MODIFICATIONS
@@ -27,23 +30,53 @@ ynh_script_progression --message="Creating backup before modifications..." --wei
 ynh_backup_create --include_backup=1 --include_app_dir=1
 
 #=================================================
-# ASK FOR NEW MODE
+# GET NEW SETTINGS FROM ARGUMENTS
 #=================================================
-ynh_script_progression --message="Configuring new mode..." --weight=2
+ynh_script_progression --message="Configuring new settings..." --weight=2
 
-# Ask for new mode
-echo "Current mode: $current_mode"
-echo "Available modes:"
-echo "1) classic - Standard static files + PHP"
-echo "2) cms - Front controller for WordPress/Drupal (index.php in /www/)"
-echo "3) cms-public - Front controller for Laravel/Symfony (index.php in /www/public/)"
-echo ""
-read -p "Enter new mode (classic/cms/cms-public): " new_mode
+# Get new settings from arguments
+new_mode=${1:-$current_mode}
+new_phpversion=${2:-$current_phpversion}
+new_custom_error_file=${3:-$current_custom_error_file}
+new_with_sftp=${4:-$current_with_sftp}
+new_password=${5:-$current_password}
 
-# Validate input
-if [[ ! "$new_mode" =~ ^(classic|cms|cms-public)$ ]]; then
-    ynh_die --message="Invalid mode. Please choose: classic, cms, or cms-public"
+# If no arguments provided, show current settings
+if [ -z "$1" ] && [ -z "$2" ] && [ -z "$3" ] && [ -z "$4" ] && [ -z "$5" ]; then
+    ynh_print_info --message="Current configuration:"
+    ynh_print_info --message="  Mode: $current_mode"
+    ynh_print_info --message="  PHP Version: $current_phpversion"
+    ynh_print_info --message="  Custom Error Pages: $current_custom_error_file"
+    ynh_print_info --message="  SFTP Access: $current_with_sftp"
+    ynh_print_info --message="Usage: $0 [mode] [phpversion] [custom_error_file] [with_sftp] [password]"
+    ynh_print_info --message="Example: $0 cms 8.4 true true"
+    exit 0
 fi
+
+# Validate mode input
+if [[ ! "$new_mode" =~ ^(classic|cms|cms-public)$ ]]; then
+    ynh_die --message="Invalid mode: $new_mode. Please choose: classic, cms, or cms-public"
+fi
+
+# Validate PHP version input
+if [[ ! "$new_phpversion" =~ ^(none|7\.4|8\.0|8\.1|8\.2|8\.3|8\.4)$ ]]; then
+    ynh_die --message="Invalid PHP version: $new_phpversion"
+fi
+
+# Validate boolean inputs
+if [[ ! "$new_custom_error_file" =~ ^(true|false)$ ]]; then
+    ynh_die --message="Invalid custom_error_file value: $new_custom_error_file"
+fi
+
+if [[ ! "$new_with_sftp" =~ ^(true|false)$ ]]; then
+    ynh_die --message="Invalid with_sftp value: $new_with_sftp"
+fi
+
+ynh_print_info --message="Updating configuration:"
+ynh_print_info --message="  Mode: $current_mode -> $new_mode"
+ynh_print_info --message="  PHP Version: $current_phpversion -> $new_phpversion"
+ynh_print_info --message="  Custom Error Pages: $current_custom_error_file -> $new_custom_error_file"
+ynh_print_info --message="  SFTP Access: $current_with_sftp -> $new_with_sftp"
 
 #=================================================
 # UPDATE NGINX CONFIGURATION
@@ -56,6 +89,7 @@ nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
 rm -f "$nginx_extra_conf_dir/cms.conf"
 rm -f "$nginx_extra_conf_dir/cms-public.conf"
 rm -f "$nginx_extra_conf_dir/php.conf"
+rm -f "$nginx_extra_conf_dir/error-code.conf"
 
 # Add new mode-specific configuration
 if [ "$new_mode" = "cms" ]
@@ -81,10 +115,16 @@ echo 'CMS-Public mode is ready. Please upload your CMS files.';
     
 else
     # Classic mode: Standard PHP configuration
-    if [ "$current_phpversion" != "none" ]
+    if [ "$new_phpversion" != "none" ]
     then
         ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
     fi
+fi
+
+# Add custom error handling if enabled
+if [ "$new_custom_error_file" = "true" ]
+then
+    ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
 fi
 
 #=================================================
@@ -92,8 +132,16 @@ fi
 #=================================================
 ynh_script_progression --message="Updating application settings..." --weight=1
 
-# Store new mode
-ynh_app_setting_set --app=$app --key=mode --value=$new_mode
+# Store new settings
+ynh_app_setting_set --app=$app --key=mode --value="$new_mode"
+ynh_app_setting_set --app=$app --key=phpversion --value="$new_phpversion"
+ynh_app_setting_set --app=$app --key=custom_error_file --value="$new_custom_error_file"
+ynh_app_setting_set --app=$app --key=with_sftp --value="$new_with_sftp"
+
+# Update password if provided
+if [ -n "$new_password" ]; then
+    ynh_app_setting_set --app=$app --key=password --value="$new_password"
+fi
 
 #=================================================
 # RELOAD NGINX
@@ -107,7 +155,8 @@ systemctl reload nginx
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Mode change completed successfully" --last
+ynh_script_progression --message="Configuration update completed successfully" --last
 
-echo "Mode changed from '$current_mode' to '$new_mode'"
-echo "Nginx configuration has been updated and reloaded"
+ynh_print_info --message="Configuration updated successfully!"
+ynh_print_info --message="Nginx configuration has been updated and reloaded"
+ynh_print_info --message="You can now access your application with the new configuration"
