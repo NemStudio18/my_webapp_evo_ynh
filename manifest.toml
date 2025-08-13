@@ -39,8 +39,8 @@ ram.runtime = "50M"
     [install.password]
     type = "password"
     optional = true
-    help.en = "Optional, this corresponds to the password for SFTP access, if you enabled it"
-    help.fr = "Optionnel, corresponds au mot de passe pour l'accès SFTP, si vous l'avez activé"
+    help.en = "Optional: SFTP password. If empty and SFTP enabled, will use your current user password"
+    help.fr = "Optionnel: Mot de passe SFTP. Si vide et SFTP activé, utilisera votre mot de passe utilisateur actuel"
 
     [install.init_main_permission]
     type = "group"
@@ -67,6 +67,15 @@ ram.runtime = "50M"
     default = false
     help = "Once custom error enabled, you can add/create a custom `404.html` file in a directory `www/error`."
 
+    [install.mode]
+    ask.en = "Choose the application mode"
+    ask.fr = "Choisissez le mode de l'application"
+    type = "select"
+    choices = ["classic", "cms", "cms-public"]
+    default = "classic"
+    help.en = "Classic: Standard static files + PHP. CMS: Front controller for WordPress/Drupal. CMS-Public: Front controller with index.php in /public folder (Laravel/Symfony)."
+    help.fr = "Classic: Fichiers statiques + PHP standard. CMS: Front controller pour WordPress/Drupal. CMS-Public: Front controller avec index.php dans le dossier /public (Laravel/Symfony)."
+
 [resources]
     [resources.system_user]
 
@@ -74,6 +83,39 @@ ram.runtime = "50M"
 
     [resources.permissions]
     main.url = "/"
+
+[documentation]
+    [documentation.overview]
+    en = "My Webapp is a flexible web application platform with three deployment modes: Classic (static files), CMS (WordPress/Drupal), and CMS-Public (Laravel/Symfony)."
+    fr = "My Webapp est une plateforme d'application web flexible avec trois modes de déploiement : Classic (fichiers statiques), CMS (WordPress/Drupal), et CMS-Public (Laravel/Symfony)."
+
+    [documentation.quick_start]
+    en = "QUICK_START.md"
+    fr = "QUICK_START.md"
+
+    [documentation.examples]
+    en = "EXAMPLES.md"
+    fr = "EXAMPLES.md"
+
+    [documentation.admin]
+    en = "ADMIN.md"
+    fr = "ADMIN_fr.md"
+
+    [documentation.post_install]
+    en = "POST_INSTALL.md"
+    fr = "POST_INSTALL_fr.md"
+
+    [documentation.icons]
+    en = "ICONS.md"
+    fr = "ICONS.md"
+
+    [documentation.test]
+    en = "TEST_ACCESS.md"
+    fr = "TEST_ACCESS.md"
+
+    [documentation.readme]
+    en = "README.md"
+    fr = "README.md"
 
     [resources.apt]
     packages = "nginx"  # Kind of "dummy" value to be sure to have a non-empty dep list

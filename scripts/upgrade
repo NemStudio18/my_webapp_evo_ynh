@@ -56,6 +56,12 @@ if [ -z "${custom_error_file:-}" ]; then
 	ynh_app_setting_set --app=$app --key=custom_error_file --value=$custom_error_file
 fi
 
+# If mode doesn't exist, create it (default to classic for backward compatibility)
+if [ -z "${mode:-}" ]; then
+	mode="classic"
+	ynh_app_setting_set --app=$app --key=mode --value=$mode
+fi
+
 # Delete old user
 if [ -n "$(ynh_app_setting_get --app=$app --key=user)" ]
 then
@@ -83,21 +89,48 @@ nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
 
 mkdir -p "$nginx_extra_conf_dir"
 
-# Prepare nginx extra conf
-if [ $phpversion != "none" ]
-then
-    ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
-    YNH_PHP_VERSION="$phpversion"
-fi
-
-# Add the config error code
-if [ $custom_error_file -eq 1 ]
-then
-    ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
-fi
-
-# Create a dedicated NGINX config
+# Create a dedicated NGINX config (always needed)
 ynh_add_nginx_config
+
+# Choose additional configuration based on mode
+if [ "$mode" = "cms" ]
+then
+    # CMS mode: Add front controller pattern on top of base config
+    ynh_add_config --template="nginx-cms.conf" --destination="$nginx_extra_conf_dir/cms.conf"
+    YNH_PHP_VERSION="$phpversion"
+    
+    # Add custom error handling for CMS mode
+    if [ $custom_error_file -eq 1 ]
+    then
+        ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+    fi
+elif [ "$mode" = "cms-public" ]
+then
+    # CMS-Public mode: Add front controller pattern pointing to /public folder
+    ynh_add_config --template="nginx-cms-public.conf" --destination="$nginx_extra_conf_dir/cms-public.conf"
+    YNH_PHP_VERSION="$phpversion"
+    
+    # Add custom error handling for CMS-Public mode
+    if [ $custom_error_file -eq 1 ]
+    then
+        ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+    fi
+else
+    # Classic mode: Standard PHP configuration
+    if [ $phpversion != "none" ]
+    then
+        ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+        YNH_PHP_VERSION="$phpversion"
+    fi
+
+    if [ $custom_error_file -eq 1 ]
+    then
+        # Add the custom error build with the application
+        ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+    fi
+fi
+
+# Add example configuration
 ynh_add_config --template="example-custom-nginx-config.conf" --destination="$nginx_extra_conf_dir/sample.conf"
 
 #=================================================

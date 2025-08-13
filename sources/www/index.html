@@ -1,35 +1,239 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>My Webapp</title>
-  </head>
-  <body>
-    <h1>It works!</h1>
-    <p>Congratulation, you have just installed My Webapp.</p>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Webapp - Installation Réussie</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <h2>Edit this site</h2>
-    <p>
-      First way to edit this site is by putting your files in /var/www/__APP__/www using SSH/SCP.
-    </p>
-    <p>
-      Alternatively you can achieve the same thing using SFTP. To do so, you can use a client application such as
-      <a href="https://filezilla-project.org/download.php?type=client" target="_blank">FileZilla</a>.
-      Here are the SFTP connection details:
-    </p>
-    <dl>
-      <dt>Domain</dt>
-      <dd>__DOMAIN__</dd>
-      <dt>Port</dt>
-      <dd>__SSH_PORT__</dd>
-      <dt>User</dt>
-      <dd>__ID__</dd>
-      <dt>Password</dt>
-      <dd><i>the one you set at installation</i></dd>
-    </dl>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    <hr/>
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            padding: 50px;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-    <p>As a reward, here is a random cat picture:</p>
-    <img src="https://thecatapi.com/api/images/get?format=src&type=gif">
-  </body>
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #667eea;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 3em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            text-align: left;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box p {
+            color: #495057;
+            margin: 8px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .code {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+            border: 1px solid #34495e;
+        }
+
+        .btn-container {
+            margin: 40px 0;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 35px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            color: #7f8c8d;
+            font-size: 1em;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <h1>Installation Réussie !</h1>
+            <p class="subtitle">Félicitations ! Votre application My Webapp est maintenant prête à l'emploi.</p>
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-box">
+                <h3><i class="fas fa-key"></i> Informations SFTP</h3>
+                <p><strong>Hôte :</strong> <span class="highlight">__DOMAIN__</span></p>
+                <p><strong>Utilisateur :</strong> <span class="highlight">__ID__</span></p>
+                <p><strong>Port :</strong> <span class="highlight">__SSH_PORT__</span></p>
+                <p><strong>Répertoire :</strong> <span class="highlight">/var/www/__APP__/www/</span></p>
+            </div>
+
+            <div class="info-box">
+                <h3><i class="fas fa-rocket"></i> Prochaines Étapes</h3>
+                <p>1. <strong>Connectez-vous</strong> via SFTP avec votre client préféré</p>
+                <p>2. <strong>Uploadez vos fichiers</strong> dans le répertoire www/</p>
+                <p>3. <strong>Visitez votre site</strong> pour voir le résultat</p>
+            </div>
+
+            <div class="info-box">
+                <h3><i class="fas fa-lightbulb"></i> Conseils de Pro</h3>
+                <p>• <strong>FileZilla</strong> : Excellent pour Windows, Mac et Linux</p>
+                <p>• <strong>Cyberduck</strong> : Interface native sur Mac et Windows</p>
+                <p>• <strong>Permissions</strong> : 755 pour dossiers, 644 pour fichiers</p>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="https://filezilla-project.org/download.php?type=client" class="btn" target="_blank">
+                <i class="fas fa-download"></i> Télécharger FileZilla
+            </a>
+            <a href="https://cyberduck.io/" class="btn" target="_blank">
+                <i class="fas fa-download"></i> Télécharger Cyberduck
+            </a>
+        </div>
+
+        <div class="footer">
+            <p><strong>My Webapp</strong> - Plateforme d'application web flexible et moderne</p>
+            <p>Trois modes disponibles : Classic, CMS et CMS-Public</p>
+        </div>
+    </div>
+</body>
 </html>

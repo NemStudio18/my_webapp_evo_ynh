@@ -22,7 +22,26 @@ ssh_port=$(grep "^Port" /etc/ssh/sshd_config | awk '{print $2}')
 #=================================================
 ynh_script_progression --message="Validating installation parameters..." --weight=2
 
-[ $with_sftp -eq 0 ] || [ "$password" != "" ] || ynh_die --message="You need to set a password to enable SFTP"
+# If SFTP is enabled but no password is provided, use the current user's password
+if [ $with_sftp -eq 1 ] && [ "$password" = "" ]
+then
+    # Get the current user's password (the one installing the app)
+    echo "SFTP enabled but no password provided. Using current user's password for SFTP access."
+    password=$(ynh_app_setting_get --app=$app --key=admin_password 2>/dev/null || echo "")
+    
+    # If still no password, prompt the user
+    if [ "$password" = "" ]
+    then
+        echo "Please enter your current user password for SFTP access:"
+        read -s password
+        echo ""
+        
+        if [ "$password" = "" ]
+        then
+            ynh_die --message="Password cannot be empty for SFTP access"
+        fi
+    fi
+fi
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
@@ -30,6 +49,7 @@ ynh_script_progression --message="Validating installation parameters..." --weigh
 ynh_script_progression --message="Storing installation settings..." --weight=1
 
 ynh_app_setting_set --app=$app --key=password --value=$password
+ynh_app_setting_set --app=$app --key=mode --value=$mode
 
 #=================================================
 # CREATE A MYSQL DATABASE
@@ -60,22 +80,48 @@ ynh_script_progression --message="Configuring NGINX web server..." --weight=2
 nginx_extra_conf_dir="/etc/nginx/conf.d/$domain.d/$app.d"
 mkdir -p "$nginx_extra_conf_dir"
 
-# Prepare nginx extra conf
-if [ $phpversion != "none" ]
-then
-    ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
-    YNH_PHP_VERSION="$phpversion"
-fi
-
-if [ $custom_error_file -eq 1 ]
-then
-    # Add the custom error build with the application
-    ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
-fi
-
-
-# Create a dedicated NGINX config
+# Create a dedicated NGINX config (always needed)
 ynh_add_nginx_config
+
+# Choose additional configuration based on mode
+if [ "$mode" = "cms" ]
+then
+    # CMS mode: Add front controller pattern on top of base config
+    ynh_add_config --template="nginx-cms.conf" --destination="$nginx_extra_conf_dir/cms.conf"
+    YNH_PHP_VERSION="$phpversion"
+    
+    # Add custom error handling for CMS mode
+    if [ $custom_error_file -eq 1 ]
+    then
+        ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+    fi
+elif [ "$mode" = "cms-public" ]
+then
+    # CMS-Public mode: Add front controller pattern pointing to /public folder
+    ynh_add_config --template="nginx-cms-public.conf" --destination="$nginx_extra_conf_dir/cms-public.conf"
+    YNH_PHP_VERSION="$phpversion"
+    
+    # Add custom error handling for CMS-Public mode
+    if [ $custom_error_file -eq 1 ]
+    then
+        ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+    fi
+else
+    # Classic mode: Standard PHP configuration
+    if [ $phpversion != "none" ]
+    then
+        ynh_add_config --template="nginx-php.conf" --destination="$nginx_extra_conf_dir/php.conf"
+        YNH_PHP_VERSION="$phpversion"
+    fi
+
+    if [ $custom_error_file -eq 1 ]
+    then
+        # Add the custom error build with the application
+        ynh_add_config --template="nginx-code-error.conf" --destination="$nginx_extra_conf_dir/error-code.conf"
+    fi
+fi
+
+# Add example configuration
 ynh_add_config --template="example-custom-nginx-config.conf" --destination="$nginx_extra_conf_dir/sample.conf"
 
 #=================================================
@@ -106,11 +152,35 @@ fi
 
 mkdir -p "$install_dir/www"
 
-if [ $with_sftp -eq 1 ]
+# Create public folder for CMS-Public mode
+if [ "$mode" = "cms-public" ]
 then
-    ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
+    mkdir -p "$install_dir/www/public"
+    # Create a basic index.php in public folder for CMS-Public mode
+    echo "<?php
+// Front controller for CMS-Public mode
+// This file will be replaced by your actual CMS index.php
+echo 'CMS-Public mode is ready. Please upload your CMS files.';
+?>" > "$install_dir/www/public/index.php"
+fi
+
+# Choose the appropriate index file based on mode and SFTP status
+if [ "$mode" = "cms" ]
+then
+    # CMS mode: Use PHP index for front controller
+    ynh_add_config --template="../sources/www/index_cms.php" --destination="$install_dir/www/index.php"
+elif [ "$mode" = "cms-public" ]
+then
+    # CMS-Public mode: Use PHP index for framework with public directory
+    ynh_add_config --template="../sources/www/index_cms_public.php" --destination="$install_dir/www/index.php"
 else
-    ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
+    # Classic mode: Use HTML index
+    if [ $with_sftp -eq 1 ]
+    then
+        ynh_add_config --template="../sources/www/index.html" --destination="$install_dir/www/index.html"
+    else
+        ynh_add_config --template="../sources/www/index_no_sftp.html" --destination="$install_dir/www/index.html"
+    fi
 fi
 
 chown -R $app:www-data "$install_dir"
@@ -132,6 +202,14 @@ then
     # Create a dedicatedPHP-FPM config
     ynh_add_fpm_config
 fi
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading Nginx configuration..." --weight=1
+
+# Reload Nginx to apply new configuration
+systemctl reload nginx
 
 #=================================================
 # END OF SCRIPT

@@ -11,6 +11,7 @@ test_format = 1.0
     args.password = "SuperDuper_StrongPassw0rd"
     args.database = "none"
     args.phpversion = "8.3"
+    args.mode = "classic"
     test_upgrade_from.bf5d3ed.name = "1.0~ynh14"
     test_upgrade_from.bf5d3ed.args.with_mysql = "0"
     test_upgrade_from.bf5d3ed.args.domain = "sub.domain.tld"
@@ -54,3 +55,28 @@ test_format = 1.0
     test_upgrade_from.bf5d3ed.args.domain = "sub.domain.tld"
     test_upgrade_from.bf5d3ed.args.path = "/"
     test_upgrade_from.bf5d3ed.args.password = "SuperDuper_StrongPassw0rd"
+
+[cms_mode_test]
+
+    args.mode = "cms"
+    args.phpversion = "8.4"
+    only = ["install.subdir", "backup_restore"]
+
+[cms_public_mode_test]
+
+    args.mode = "cms-public"
+    args.phpversion = "8.4"
+    only = ["install.subdir", "backup_restore"]
+
+[no_sftp_test]
+
+    args.with_sftp = "0"
+    args.mode = "classic"
+    only = ["install.subdir"]
+
+[mode_switching_test]
+
+    args.mode = "cms"
+    args.phpversion = "8.4"
+    only = ["install.subdir"]
+    # This test will verify that the mode can be changed after installation

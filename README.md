@@ -8,7 +8,17 @@ It shall NOT be edited by hand.
   My Webapp, packaged for YunoHost
 </h1>
 
-Custom Web app with SFTP access to serve static (HTML, CSS, JS) and PHP files
+Flexible Web Application with Three Deployment Modes: Classic, CMS, and CMS-Public
+
+**Features:**
+- **Classic Mode**: Traditional static files and PHP serving
+- **CMS Mode**: Front controller for WordPress, Drupal, and traditional CMS
+- **CMS-Public Mode**: Front controller for Laravel, Symfony, and modern frameworks
+- **SFTP Access**: Easy file upload with automatic password management
+- **Database Support**: MySQL/PostgreSQL with automatic backup/restore
+- **PHP-FPM**: Multiple PHP versions (7.4 to 8.4)
+- **Mode Switching**: Change modes after installation without reinstalling
+- **Professional Interface**: Modern, responsive welcome pages for each mode
 
 [![Version: 1.0~ynh21](https://img.shields.io/badge/Version-1.0~ynh21-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/my_webapp/)
 

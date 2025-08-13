@@ -1,35 +1,82 @@
-This app is simply a blank web app skeleton : you are expected to add you own content (HTML, CSS, PHP, ...) inside `__INSTALL_DIR__/www/`. One way to do so is by using SFTP.
+# 🔧 Administration Guide
 
-### Login using SFTP
+This guide covers advanced administration tasks for My Webapp.
 
-Once installed, go to the chosen URL to know the username, domain and port you will have to use for the SFTP access. 
+## 🎯 **Mode Management**
 
-- Host: `__DOMAIN__`
-- Username: `__ID__`
-- Password: password chosen during installation
-- Port: 22 (unless you changed the SSH port)
+### **Changing Application Mode**
+```bash
+sudo ./scripts/config
+```
 
-To connect, you'll need an SFTP app such as [Filezilla](https://filezilla-project.org/) for Windows, Mac or Linux. You can also use your default file manager on [Mac](https://support.apple.com/guide/mac-help/connect-mac-shared-computers-servers-mchlp1140/mac) or Linux.
+**Available modes:**
+- `classic` - Standard static files + PHP
+- `cms` - Front controller (WordPress, Drupal)
+- `cms-public` - Front controller with `/public` directory
 
-#### Forgot your SFTP password?
+### **Mode-Specific Configurations**
 
-If you forgot your SFTP password, you can change it in YunoHost's webadmin interface in `Apps > My webapp > My Webapp configuration`.
-You can also check there that SFTP is enabled.
+#### **Classic Mode**
+- Uses `nginx-php.conf` for PHP support
+- Serves files directly from `/www/`
 
-### Login using the command line
+#### **CMS Mode**
+- Uses `nginx-cms.conf` for front controller
+- Routes all requests through `index.php`
 
-Starting YunoHost v11.1.21, you can run `sudo yunohost app shell __APP__` in the command line interface to log in as your app user.
+#### **CMS-Public Mode**
+- Uses `nginx-cms-public.conf` for framework support
+- Serves from `/www/public/` directory
 
-The `php` command will point to the PHP version installed for the app.
+## 📁 **File Management**
 
-### Adding or editing files
+### **SFTP/SSH Access**
+- **Username:** `__ID__`
+- **Password:** Set during installation or admin password
+- **Directory:** `/var/www/__APP__/www/`
 
-Once logged in, under the Web directory you will see a `www` folder which contains the public files served by this app. You can put all the files of your custom Web application inside.
+### **Important Directories**
+- `/www/` - Main application files
+- `/www/public/` - Public files (CMS-Public mode)
+- `/conf/` - Configuration templates
+- `/scripts/` - Administration scripts
 
-### 403 and 404 error handling
+## 🔒 **Security**
 
-The web server configuration supports http error handling `403` and `404` (access denied and resource not found). Create an `error` folder at `__INSTALL_DIR__/www/error`, and put your `403.html` and `404.html` files in there.
+### **File Permissions**
+- Application files: `__ID__:__ID__`
+- Configuration files: `root:root`
 
-### Customizing the nginx configuration
+### **Protected Files**
+- `.env`, `.json`, `.ini` files are blocked
+- Hidden directories (except `.well-known`) are protected
 
-If you want to add tweak the nginx configuration for this app, it is recommended to edit `/etc/nginx/conf.d/__DOMAIN__.d/__ID__.d/WHATEVER_NAME.conf` (ensure that the file has the `.conf` extension) and reload the nginx after making sure that the configuration is valid using `nginx -t`.
+## 🚀 **Maintenance**
+
+### **Backup**
+```bash
+sudo yunohost backup create --include-apps my_webapp
+```
+
+### **Restore**
+```bash
+sudo yunohost backup restore my_webapp
+```
+
+### **Upgrade**
+```bash
+sudo yunohost app upgrade my_webapp
+```
+
+## 📊 **Monitoring**
+
+### **Logs**
+- Nginx: `/var/log/nginx/`
+- PHP-FPM: `/var/log/php8.x-fpm.log`
+- Application: `/var/log/my_webapp/`
+
+### **Status Check**
+```bash
+sudo systemctl status nginx
+sudo systemctl status php8.x-fpm
+```

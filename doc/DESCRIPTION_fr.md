@@ -1,11 +1,50 @@
-Cette application vous permet d'installer facilement une application vide, dans laquelle vous pouvez déployer votre propre site web "statique" (HTML/CSS/JS) ou PHP.
+# 🚀 My Webapp - Plateforme Web Flexible
 
-Les fichiers être déposé [via SFTP](https://yunohost.org/fr/filezilla) ou toute autre méthode de votre choix.
+**My Webapp** s’adapte à vos besoins avec trois modes d’installation.
 
-Lors de l'installation, il est aussi possible d'initialiser une base de données MySQL ou PostgreSQL, qui sera sauvegardée et restaurée avec le reste de l'application. Les détails de connexion seront stockés dans le fichier `db_accesss.txt` situé dans le répertoire racine.
+## 🎯 **Modes d’installation**
 
-La version de PHP-FPM peut aussi être choisie, parmi (aucune), `7.4`, `8.0`, `8.1`, `8.2`, `8.3` et `8.4`.
+### **Mode Classique**
+- Fichiers statiques + support PHP
+- Idéal pour sites simples
+- Démarrage rapide
 
-**Une fois installée, rendez-vous sur l'URL choisie pour connaître l'utilisateur, le domaine et le port que vous devrez utiliser pour l'accès SFTP.** Le mot de passe est celui que vous avez choisi lors de l'installation. Sous le répertoire Web, vous verrez un dossier `www` qui contient les fichiers publics servis par cette application. Vous pouvez mettre tous les fichiers de votre application Web personnalisée à l'intérieur.
+### **Mode CMS**
+- Front controller (WordPress, Drupal)
+- `index.php` dans le dossier `/www/`
+- Routage professionnel
 
-L'application vous permet aussi de gérer - si vous activez l'option dans le panneau de configuration - la gestion des erreurs 404, il vous suffit de créer un dossier `error` dans le répertoire racine `www` et d'y placer vos fichiers d'erreur `html` 
+### **Mode CMS-Public**
+- Front controller pour frameworks (Laravel, Symfony)
+- `index.php` dans le dossier `/www/public/`
+- Support des frameworks modernes
+
+## ✨ **Fonctionnalités clés**
+
+- **Changement de mode** après installation
+- **Accès SFTP** avec gestion intelligente du mot de passe
+- **Support base de données** (MySQL/PostgreSQL)
+- **Versions PHP** 7.4 à 8.4
+- **Pages d’erreur personnalisées**
+- **Pages d’accueil professionnelles**
+
+## 🚀 **Démarrage rapide**
+
+1. Choisissez votre mode lors de l’installation
+2. Envoyez vos fichiers via SFTP/SSH
+3. Configurez votre application
+4. C’est prêt
+
+## 🔧 **Après l’installation**
+
+Changer de mode à tout moment :
+```bash
+sudo ./scripts/config
+```
+
+## 💡 **Conseils**
+
+- Commencez par le mode Classique si vous hésitez
+- Utilisez le mode CMS pour WordPress/Drupal
+- Utilisez le mode CMS-Public pour Laravel/Symfony
+- Tous les modes supportent PHP et une base de données 
